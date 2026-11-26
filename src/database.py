@@ -79,15 +79,17 @@ def get_dossier_by_patient(patient_id):
 
 
 def update_dossier_encrypted(dossier_id, encrypted_diagnostic,
-                              encrypted_medicaments, sensitivity_level):
+                              encrypted_medicaments, sensitivity_level,
+                              encrypted_notes=None):
+    # encrypted_notes=None laisse le champ notes tel quel (COALESCE)
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
         UPDATE dossiers_medicaux
-        SET diagnostic = %s, medicaments = %s, is_encrypted = 1,
-            sensitivity_level = %s, updated_at = CURRENT_TIMESTAMP
+        SET diagnostic = %s, medicaments = %s, notes = COALESCE(%s, notes),
+            is_encrypted = 1, sensitivity_level = %s, updated_at = CURRENT_TIMESTAMP
         WHERE id = %s
-    """, (encrypted_diagnostic, encrypted_medicaments, sensitivity_level, dossier_id))
+    """, (encrypted_diagnostic, encrypted_medicaments, encrypted_notes, sensitivity_level, dossier_id))
     conn.commit()
     conn.close()
 
@@ -282,15 +284,29 @@ def insert_entree(patient_id, diagnostic, medicaments, notes, medecin_auteur, se
     return entree_id
 
 
-def update_entree_encrypted(entree_id, encrypted_diagnostic, encrypted_medicaments, sensitivity_level):
-    """Chiffre le contenu d'une entrée après sa classification."""
+def update_entree_encrypted(entree_id, encrypted_diagnostic, encrypted_medicaments, sensitivity_level,
+                            encrypted_notes=None):
+    """Chiffre le contenu d'une entrée après sa classification.
+    encrypted_notes=None laisse le champ notes tel quel (COALESCE)."""
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
         UPDATE entrees_dossier
-        SET diagnostic = %s, medicaments = %s, is_encrypted = 1, sensitivity_level = %s
+        SET diagnostic = %s, medicaments = %s, notes = COALESCE(%s, notes),
+            is_encrypted = 1, sensitivity_level = %s
         WHERE id = %s
-    """, (encrypted_diagnostic, encrypted_medicaments, sensitivity_level, entree_id))
+    """, (encrypted_diagnostic, encrypted_medicaments, encrypted_notes, sensitivity_level, entree_id))
+    conn.commit()
+    conn.close()
+
+
+def update_notes_chiffrees(table, ligne_id, encrypted_notes):
+    """Réécrit seulement le champ notes (migration des notes restées en clair)."""
+    if table not in ("dossiers_medicaux", "entrees_dossier"):
+        raise ValueError(f"Table non autorisée : {table}")
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(f"UPDATE {table} SET notes = %s WHERE id = %s", (encrypted_notes, ligne_id))
     conn.commit()
     conn.close()
 

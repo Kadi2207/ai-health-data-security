@@ -10,14 +10,14 @@ Projet de sécurisation de données de santé, développé lors d'un stage chez 
 
 **Une IA de classification détecte automatiquement les données sensibles et déclenche leur chiffrement, dans une architecture Zero Trust : chaque accès est authentifié, autorisé par rôle, tracé et surveillé.**
 
-Quand un médecin saisit un dossier, un classifieur hybride (règles et modèle d'apprentissage supervisé) estime la sensibilité de chaque champ, et le diagnostic et les médicaments jugés sensibles sont chiffrés automatiquement. Autour de ce classifieur, l'application authentifie, autorise par rôle, trace et surveille chaque accès. Le modèle atteint une exactitude (accuracy) de 82,5 % sur 40 textes de test, mesurée sur un petit corpus de 197 phrases fictives : c'est un ordre de grandeur, pas une garantie, et les règles déterministes restent prioritaires.
+Quand un médecin saisit un dossier, un classifieur hybride (règles et modèle d'apprentissage supervisé) estime la sensibilité de chaque champ, et le diagnostic, les médicaments et les notes jugés sensibles sont chiffrés automatiquement. Autour de ce classifieur, l'application authentifie, autorise par rôle, trace et surveille chaque accès. Le modèle atteint une exactitude (accuracy) de 82,5 % sur 40 textes de test, mesurée sur un petit corpus de 197 phrases fictives : c'est un ordre de grandeur, pas une garantie, et les règles déterministes restent prioritaires.
 
 **Données 100 % fictives.** Patients, dossiers et numéros NIR sont générés avec Faker ; aucune donnée de santé réelle n'est utilisée. Ce dépôt est une démonstration, pas un logiciel prêt pour la production (voir [Limites](#limites)).
 
 ## Ce que fait le projet
 
 - **Classifie la sensibilité de chaque dossier** (faible, moyenne ou élevée) en combinant des règles déterministes, un modèle TF-IDF + Random Forest et une décision prudente : une seule règle déclenchée suffit à classer tout le dossier en sensibilité élevée.
-- **Chiffre automatiquement** le diagnostic et les médicaments classés sensibles, avec Fernet (AES-128-CBC + HMAC-SHA256). La clé est lue depuis `.env` et n'est jamais versionnée.
+- **Chiffre automatiquement** le diagnostic, les médicaments et les notes classés sensibles, avec Fernet (AES-128-CBC + HMAC-SHA256). La clé est lue depuis `.env` et n'est jamais versionnée.
 - **Authentifie** avec des mots de passe hachés par bcrypt (12 caractères minimum, majuscule, minuscule, chiffre et caractère spécial), un changement de mot de passe imposé à la première connexion et une double authentification TOTP. Un appareil de confiance peut être dispensé de la 2FA pendant 30 jours ; le mot de passe reste toujours exigé.
 - **Limite les tentatives** à 10 requêtes par minute sur la connexion, la 2FA et l'enregistrement d'un appareil.
 - **Contrôle les accès** par rôle (admin, médecin, infirmier, patient) : un patient ne peut lire que son propre dossier, quel que soit l'identifiant demandé.
@@ -34,7 +34,7 @@ Chaque ligne a été vérifiée dans le code et dans `data/model.pkl`, pas dans 
 |---|---|---|
 | Classification hybride en 3 couches : règles, modèle, décision | couvert | `src/classifier.py` (`layer1_check`, `layer2_predict`, `layer3_decide`), `tests/test_classifier.py` |
 | Modèle TF-IDF + Random Forest de 300 arbres | couvert | `src/train_model.py` (`train_and_save`) ; `data/model.pkl` (`n_estimators=300`, `accuracy=0.825`) |
-| Chiffrement automatique des données sensibles | partiel | Le diagnostic et les médicaments sont chiffrés (`src/encryption.py`, `database.update_dossier_encrypted`, `tests/test_encryption.py`). Le champ « notes » est classé mais jamais chiffré, et un dossier est enregistré avant d'être chiffré. |
+| Chiffrement automatique des données sensibles | couvert | Les trois champs (diagnostic, médicaments, notes) sont chiffrés quand ils sont classés sensibles (`src/encryption.py`, `database.update_dossier_encrypted`, `database.update_entree_encrypted`) ; les notes déjà en base sont migrées au démarrage (`app.chiffrer_notes_existantes`). Tests : `tests/test_encryption.py`, `tests/test_ameliorations.py` (note relue chiffrée en base). |
 | Mots de passe bcrypt, changement imposé, 2FA TOTP | couvert | `src/auth.py`, `src/app.py` |
 | Appareil de confiance (30 jours, mot de passe toujours exigé) | couvert | `src/trusted_device.py` |
 | Limitation des tentatives | couvert | `src/app.py` (`@limiter.limit("10 per minute")` sur 3 routes) |
@@ -43,21 +43,19 @@ Chaque ligne a été vérifiée dans le code et dans `data/model.pkl`, pas dans 
 | Détection d'intrusion sur 4 vecteurs et blocage | couvert | `src/security_monitor.py` (`detecter_brute_force`, `detecter_password_spray`, `detecter_escalade_privileges`, `detecter_acces_anormal`, `scan_complet`) |
 | Score de conformité pondéré | couvert | `src/app.py` (`calculer_conformite`) |
 | Tableau de bord | couvert | `templates/index.html` (graphiques Chart.js, message de repli si la bibliothèque ne se charge pas) |
-| Rapport PDF de conformité | partiel | La route `/rapport-pdf` existe (`src/app.py`) mais ne fonctionne pas dans la version actuelle. |
+| Rapport PDF de conformité | couvert | `src/app.py` (`rapport_pdf`, réservé aux sessions authentifiées), `tests/test_ameliorations.py` (PDF renvoyé à un admin connecté, redirection sans session) |
 | Interface bilingue FR / EN | couvert | `translations/` (Flask-Babel), `static/i18n.js` |
 | Thème clair / sombre | couvert | `static/theme.js` (choix mémorisé, sinon préférence du système) |
 | Échappement des données affichées (protection XSS) | couvert | `static/ui.js` (`esc`) |
-| Tests automatisés | partiel | 17 tests sur la classification et le chiffrement (`tests/`), tous réussis en local ; aucune intégration continue. |
-| Messages de connexion qui ne révèlent pas les identifiants existants | prévu | Absent du code : `src/auth.py` distingue « utilisateur introuvable » et « mot de passe incorrect ». |
+| Tests automatisés | partiel | 28 tests (`tests/`), tous réussis en local ; aucune intégration continue. |
+| Message de connexion unique (anti-énumération) | couvert | `src/app.py` (`api_login`) : « Identifiant ou mot de passe incorrect. » dans tous les cas, le motif réel restant dans le journal d'audit ; `tests/test_ameliorations.py` |
 
 ### Prochaines étapes
 
-Évolutions prévues pour les points partiels ou prévus du tableau :
+Évolutions prévues :
 
-- chiffrer aussi le champ « notes », et chiffrer un dossier avant son enregistrement plutôt qu'après ;
-- corriger l'export PDF du rapport de conformité (`/rapport-pdf`) ;
-- ajouter une intégration continue qui lance les tests à chaque push ;
-- renvoyer un message d'échec de connexion unique, quel que soit le motif.
+- chiffrer un dossier avant son enregistrement plutôt que juste après ;
+- ajouter une intégration continue qui lance les tests à chaque push.
 
 ## Résultats clés
 
@@ -82,7 +80,7 @@ La vidéo de démonstration est accessible par le bouton en haut de cette page.
 2. **Couche 1, règles** (`classifier.layer1_check`) : expressions régulières (NIR, dates, e-mails, téléphones, noms de praticiens) et mots-clés médicaux critiques en français et en anglais (`data/keywords_medicaux.txt`).
 3. **Couche 2, modèle** (`classifier.layer2_predict`) : vectorisation TF-IDF (mots et bigrammes) et Random Forest de 300 arbres à classes équilibrées, entraîné une fois hors ligne (`src/train_model.py`) et chargé depuis `data/model.pkl`. Le modèle n'est utilisé qu'en français ; en anglais, seules les règles s'appliquent.
 4. **Couche 3, décision** (`classifier.layer3_decide`) : une règle déclenchée donne une sensibilité élevée, prioritaire sur le modèle. Sinon, une probabilité d'au moins 0,7 donne une sensibilité élevée, d'au moins 0,5 une sensibilité moyenne, et en dessous une sensibilité faible.
-5. **Chiffrement** (`src/encryption.py`) : le diagnostic et les médicaments classés sensibles sont chiffrés avec Fernet puis réécrits en base (`database.update_dossier_encrypted`). Au démarrage, les dossiers sensibles encore en clair sont chiffrés.
+5. **Chiffrement** (`src/encryption.py`) : le diagnostic, les médicaments et les notes classés sensibles sont chiffrés avec Fernet puis réécrits en base (`database.update_dossier_encrypted`). Un champ non sensible reste en clair et s'affiche tel quel. Au démarrage, les dossiers sensibles encore en clair sont chiffrés, ainsi que les notes sensibles enregistrées avant leur prise en charge.
 6. **Contrôle d'accès et traçabilité** : chaque requête passe par `rbac.check_access`, et le résultat est écrit dans le journal d'audit (`audit_log.log_access`).
 7. **Surveillance** (`src/security_monitor.py`) : le journal est analysé sur les 5 dernières minutes.
 
@@ -97,14 +95,13 @@ Un administrateur débloque un compte depuis l'interface en confirmant son mot d
 
 ## Limites
 
-- **Export PDF** du rapport de conformité (`/rapport-pdf`) : ne fonctionne pas dans la version actuelle.
 - **Petit corpus d'entraînement** : 197 phrases fictives en français, et une exactitude mesurée sur 40 textes seulement. C'est pour cela que les règles déterministes restent prioritaires.
-- **Champ « notes »** : analysé par le classifieur mais pas chiffré en base. Un dossier est d'abord enregistré, puis chiffré juste après sa classification.
+- **Chiffrement après enregistrement** : un dossier est d'abord enregistré, puis chiffré juste après sa classification.
 - **Serveur de développement Flask** (`debug=True`, écoute sur toutes les interfaces) : à utiliser en local uniquement. Un déploiement réel demanderait un serveur WSGI, HTTPS et `debug` désactivé.
 - **Comptes de démonstration** aux mots de passe publics (voir plus bas).
 - **Une seule clé** : la même `SECRET_KEY` sert au chiffrement Fernet et à la signature des sessions. En production, il faudrait deux clés distinctes, gérées par un coffre de secrets.
 - **Limitation des tentatives en mémoire** : les compteurs repartent de zéro au redémarrage et ne sont pas partagés entre plusieurs processus.
-- **Énumération des identifiants** : la page de connexion distingue « utilisateur introuvable » et « mot de passe incorrect ».
+- **Énumération des identifiants, cas restants** : le message d'échec est le même pour un compte inexistant et un mauvais mot de passe, mais un compte bloqué est signalé comme tel, et la réponse est plus lente quand le compte existe (le mot de passe n'est vérifié par bcrypt que dans ce cas).
 - **Modèle chargé avec `pickle`** : ne remplacer `data/model.pkl` que par un fichier de confiance, ou le régénérer avec `python src/train_model.py`.
 
 ## Lancer le projet
@@ -157,7 +154,7 @@ Le tableau de bord affiche les alertes et les blocages en temps réel.
     pip install pytest
     python -m pytest tests
 
-Résultat au 2026-11-27, en local : 17 tests réussis sur 17 (classification et chiffrement). Les tests de chiffrement demandent une `SECRET_KEY` valide dans `.env`. Aucune intégration continue ne les relance pour l'instant.
+Résultat au 2026-11-27, en local : 28 tests réussis sur 28 (classification, chiffrement, chiffrement des notes en base, export PDF, message de connexion). Les tests demandent une `SECRET_KEY` valide dans `.env`. Ceux de `tests/test_ameliorations.py` créent une base PostgreSQL temporaire, puis la suppriment ; la base de l'application n'est jamais touchée, et sans serveur PostgreSQL joignable ces tests sont ignorés. Aucune intégration continue ne les relance pour l'instant.
 
 ### Traductions
 
@@ -186,7 +183,7 @@ Après une modification des textes de l'interface :
     static/                     CSS et JavaScript (thème, traduction, interface)
     translations/               catalogues FR et EN
     data/                       schémas SQL, mots-clés médicaux, modèle entraîné (model.pkl)
-    tests/                      tests de la classification et du chiffrement
+    tests/                      tests de la classification, du chiffrement, de l'export PDF et de la connexion
     attaque.py                  démonstration d'attaque multi-vecteurs
     verif.py                    diagnostic du moteur de détection
     deblocage_secours.py        déblocage de secours hors ligne
@@ -202,7 +199,7 @@ Après une modification des textes de l'interface :
 | Chiffrement | cryptography (Fernet : AES-128-CBC + HMAC-SHA256) |
 | Authentification | bcrypt, pyotp (TOTP), qrcode |
 | Données fictives | Faker |
-| Rapport PDF | reportlab (export en cours de correction) |
+| Rapport PDF | reportlab |
 | Tableau de bord | Chart.js |
 | Tests | pytest |
 

@@ -45,6 +45,27 @@ def decrypt_dossier(dossier: dict, sensitive_fields: list) -> dict:
     return decrypted
 
 
+# Tout jeton Fernet commence par ces caractères (octet de version 0x80 suivi
+# d'un horodatage), ce qu'un texte médical saisi en clair ne fait pas.
+PREFIXE_FERNET = "gAAAAA"
+
+
+def est_chiffre(valeur) -> bool:
+    return isinstance(valeur, str) and valeur.startswith(PREFIXE_FERNET)
+
+
+def dechiffrer_si_chiffre(valeur):
+    """Déchiffre un champ seulement s'il est chiffré.
+
+    Sert au champ « notes » : comme le diagnostic et les médicaments, il n'est
+    chiffré que s'il est classé sensible, mais une note non sensible reste en
+    clair dans un dossier chiffré. Un jeton altéré donne « [Erreur déchiffrement] »,
+    comme avec decrypt_dossier."""
+    if not est_chiffre(valeur):
+        return valeur
+    return decrypt_dossier({"valeur": valeur}, ["valeur"])["valeur"]
+
+
 if __name__ == "__main__":
     load_dotenv()
     test_text = "Diabète de type 2 — Metformine 500mg"

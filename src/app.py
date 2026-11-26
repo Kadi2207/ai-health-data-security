@@ -146,14 +146,14 @@ def api_change_password():
     return jsonify({"success": True})
 
 # ── API d'authentification ────────────────────────────────────────────────────
-def _traduire_raison_auth(raison):
-    """Messages renvoyés par auth.authenticate(), traduits dans la langue de
-    l'interface. Un message inconnu est renvoyé tel quel."""
-    traductions = {
-        "Utilisateur introuvable": _("Utilisateur introuvable"),
-        "Mot de passe incorrect": _("Mot de passe incorrect"),
-    }
-    return traductions.get(raison, raison)
+# Motifs d'échec renvoyés par auth.authenticate() (inchangé) -> libellé d'audit.
+# La distinction reste DANS LE JOURNAL pour le suivi interne. Chaque libellé
+# contient « connexion » : les règles de force brute et de password spray
+# (security_monitor) continuent de compter ces échecs.
+_AUDIT_ECHEC_CONNEXION = {
+    "Utilisateur introuvable": "Échec connexion — utilisateur introuvable",
+    "Mot de passe incorrect": "Échec connexion — mot de passe incorrect",
+}
 
 
 @app.route("/api/login", methods=["POST"])
@@ -171,9 +171,12 @@ def api_login():
         })
 
     result = authenticate(username, data.get("password"))
-    if not result["success"] and result.get("reason"):
-        # Traduction du message pour l'affichage uniquement (auth.py inchangé)
-        result = dict(result, reason=_traduire_raison_auth(result["reason"]))
+    motif_interne = None
+    if not result["success"]:
+        # Anti-énumération : l'utilisateur voit toujours le même message, que
+        # le compte existe ou non. Le motif réel est gardé pour le journal.
+        motif_interne = result.get("reason")
+        result = {"success": False, "reason": _("Identifiant ou mot de passe incorrect.")}
     statut_appareil = trusted_device.ABSENT
     if result["success"]:
         session["pending_user"] = result["username"]
@@ -188,7 +191,9 @@ def api_login():
             return _connexion_par_appareil_confiance(result["username"], result["role"])
     else:
         # Log de l'échec — permet la détection de force brute
-        log_access(username, "Échec connexion — mot de passe incorrect", resultat="refusé")
+        log_access(username,
+                   _AUDIT_ECHEC_CONNEXION.get(motif_interne, "Échec connexion — mot de passe incorrect"),
+                   resultat="refusé")
 
     reponse = jsonify(result)
     if statut_appareil in _STATUTS_COOKIE_A_EFFACER:
@@ -423,7 +428,8 @@ def api_creer_dossier():
             dossier_id=dossier_id,
             encrypted_diagnostic=encrypted.get("diagnostic", diagnostic),
             encrypted_medicaments=encrypted.get("medicaments", medicaments),
-            sensitivity_level=classification["global_sensitivity"]
+            sensitivity_level=classification["global_sensitivity"],
+            encrypted_notes=encrypted.get("notes", notes)
         )
 
     log_access(medecin,
@@ -497,7 +503,8 @@ def api_ajouter_entree():
             entree_id=entree_id,
             encrypted_diagnostic=encrypted.get("diagnostic", diagnostic),
             encrypted_medicaments=encrypted.get("medicaments", medicaments),
-            sensitivity_level=classification["global_sensitivity"]
+            sensitivity_level=classification["global_sensitivity"],
+            encrypted_notes=encrypted.get("notes", notes)
         )
 
     log_access(medecin,
@@ -524,7 +531,7 @@ def api_mon_dossier():
         return jsonify({"success": False, "reason": _("Réservé au patient.")}), 403
 
     from database import get_patient_id_of_user, get_dossier_by_patient, get_entrees_by_patient
-    from encryption import decrypt_dossier
+    from encryption import decrypt_dossier, dechiffrer_si_chiffre
 
     username = session.get("username")
     patient_id = get_patient_id_of_user(username)
@@ -549,7 +556,7 @@ def api_mon_dossier():
             "type": "Dossier initial",
             "diagnostic": dossier["diagnostic"],
             "medicaments": dossier["medicaments"],
-            "notes": dossier.get("notes"),
+            "notes": dechiffrer_si_chiffre(dossier.get("notes")),
             "medecin_auteur": dossier.get("medecin_auteur") or "Système (dossier initial)",
             "sensitivity_level": dossier.get("sensitivity_level", "low"),
             "date": str(dossier.get("created_at", ""))
@@ -570,7 +577,7 @@ def api_mon_dossier():
             "type": "Entrée ajoutée",
             "diagnostic": e["diagnostic"],
             "medicaments": e["medicaments"],
-            "notes": e["notes"],
+            "notes": dechiffrer_si_chiffre(e["notes"]),
             "medecin_auteur": e["medecin_auteur"],
             "sensitivity_level": e["sensitivity_level"],
             "date": str(e["created_at"])
@@ -593,7 +600,7 @@ def api_historique(patient_id):
         return jsonify({"success": False, "reason": _("Réservé au médecin.")}), 403
 
     from database import get_entrees_by_patient, get_dossier_by_patient
-    from encryption import decrypt_dossier
+    from encryption import decrypt_dossier, dechiffrer_si_chiffre
 
     historique = []
 
@@ -613,7 +620,7 @@ def api_historique(patient_id):
             "type": "Dossier initial",
             "diagnostic": dossier["diagnostic"],
             "medicaments": dossier["medicaments"],
-            "notes": dossier.get("notes"),
+            "notes": dechiffrer_si_chiffre(dossier.get("notes")),
             "medecin_auteur": dossier.get("medecin_auteur") or "Système (dossier initial)",
             "sensitivity_level": dossier.get("sensitivity_level", "low"),
             "date": str(dossier.get("created_at", ""))
@@ -635,7 +642,7 @@ def api_historique(patient_id):
             "type": "Entrée ajoutée",
             "diagnostic": e["diagnostic"],
             "medicaments": e["medicaments"],
-            "notes": e["notes"],
+            "notes": dechiffrer_si_chiffre(e["notes"]),
             "medecin_auteur": e["medecin_auteur"],
             "sensitivity_level": e["sensitivity_level"],
             "date": str(e["created_at"])
@@ -986,14 +993,46 @@ def chiffrer_tous_les_dossiers():
                 dossier_id=d["id"],
                 encrypted_diagnostic=encrypted.get("diagnostic", d["diagnostic"]),
                 encrypted_medicaments=encrypted.get("medicaments", d["medicaments"]),
-                sensitivity_level=d["sensitivity_level"]
+                sensitivity_level=d["sensitivity_level"],
+                encrypted_notes=encrypted.get("notes", d["notes"])
             )
             chiffres += 1
     print(f"Chiffrement automatique : {chiffres} dossiers chiffrés.")
+
+
+def chiffrer_notes_existantes():
+    """Migration : chiffre les notes sensibles restées en clair dans les dossiers
+    et entrées déjà chiffrés (avant que le champ notes soit pris en charge).
+    Même classification et même chiffrement que pour les autres champs : une
+    note n'est chiffrée que si elle est classée sensible. Sans effet si elle
+    est déjà chiffrée, donc relançable sans risque."""
+    from classifier import classify_dossier
+    from encryption import encrypt_dossier, est_chiffre
+    from database import update_notes_chiffrees
+    migrees = 0
+    for table in ("dossiers_medicaux", "entrees_dossier"):
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute(f"""
+            SELECT id, notes FROM {table}
+            WHERE is_encrypted = 1 AND COALESCE(notes, '') <> ''
+        """)
+        lignes = cursor.fetchall()
+        conn.close()
+        for ligne in lignes:
+            if est_chiffre(ligne["notes"]):
+                continue
+            contenu = {"notes": ligne["notes"]}
+            if "notes" in classify_dossier(contenu)["sensitive_fields"]:
+                update_notes_chiffrees(table, ligne["id"],
+                                       encrypt_dossier(contenu, ["notes"])["notes"])
+                migrees += 1
+    print(f"Chiffrement des notes existantes : {migrees} note(s) chiffrée(s).")
 
 
 if __name__ == "__main__":
     init_audit_tables()
     trusted_device.init_table()
     chiffrer_tous_les_dossiers()
+    chiffrer_notes_existantes()
     app.run(debug=True, host="0.0.0.0", port=5000)

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-11-26 23:00+0100\n"
+"POT-Creation-Date: 2026-11-27 00:38+0100\n"
 "PO-Revision-Date: 2026-08-10 05:54+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -26,19 +26,15 @@ msgstr "Session invalide."
 msgid "Le mot de passe ne respecte pas la politique de sécurité."
 msgstr "Le mot de passe ne respecte pas la politique de sécurité."
 
-#: src/app.py:153 src/app.py:302 src/app.py:676
-msgid "Utilisateur introuvable"
-msgstr "Utilisateur introuvable"
-
-#: src/app.py:154
-msgid "Mot de passe incorrect"
-msgstr "Mot de passe incorrect"
-
-#: src/app.py:170 src/app.py:298
+#: src/app.py:170 src/app.py:303
 msgid "Compte bloqué pour raison de sécurité. Contactez l'administrateur."
 msgstr "Compte bloqué pour raison de sécurité. Contactez l'administrateur."
 
-#: src/app.py:259
+#: src/app.py:179
+msgid "Identifiant ou mot de passe incorrect."
+msgstr "Identifiant ou mot de passe incorrect."
+
+#: src/app.py:264
 msgid ""
 "La double authentification est requise pour faire confiance à cet "
 "appareil."
@@ -46,31 +42,35 @@ msgstr ""
 "La double authentification est requise pour faire confiance à cet "
 "appareil."
 
-#: src/app.py:292
+#: src/app.py:297
 msgid "Session de connexion invalide. Veuillez ressaisir votre mot de passe."
 msgstr "Session de connexion invalide. Veuillez ressaisir votre mot de passe."
 
-#: src/app.py:318
+#: src/app.py:307 src/app.py:683
+msgid "Utilisateur introuvable"
+msgstr "Utilisateur introuvable"
+
+#: src/app.py:323
 msgid "Code 2FA incorrect"
 msgstr "Code 2FA incorrect"
 
-#: src/app.py:326
+#: src/app.py:331
 msgid "Utilisateur sans secret 2FA"
 msgstr "Utilisateur sans secret 2FA"
 
-#: src/app.py:354
+#: src/app.py:359
 msgid "patient_id requis"
 msgstr "patient_id requis"
 
-#: src/app.py:377
+#: src/app.py:382
 msgid "Seul un médecin peut créer un dossier."
 msgstr "Seul un médecin peut créer un dossier."
 
-#: src/app.py:392
+#: src/app.py:397
 msgid "Le diagnostic est obligatoire."
 msgstr "Le diagnostic est obligatoire."
 
-#: src/app.py:407
+#: src/app.py:412
 msgid ""
 "Nom, prénom et date de naissance sont obligatoires pour un nouveau "
 "patient."
@@ -78,76 +78,76 @@ msgstr ""
 "Nom, prénom et date de naissance sont obligatoires pour un nouveau "
 "patient."
 
-#: src/app.py:440
+#: src/app.py:446
 msgid "Dossier créé, classé et sécurisé avec succès."
 msgstr "Dossier créé, classé et sécurisé avec succès."
 
-#: src/app.py:449 src/app.py:593
+#: src/app.py:455 src/app.py:600
 msgid "Réservé au médecin."
 msgstr "Réservé au médecin."
 
-#: src/app.py:467
+#: src/app.py:473
 msgid "Seul un médecin peut ajouter une entrée."
 msgstr "Seul un médecin peut ajouter une entrée."
 
-#: src/app.py:481
+#: src/app.py:487
 msgid "Patient non spécifié."
 msgstr "Patient non spécifié."
 
-#: src/app.py:483
+#: src/app.py:489
 msgid "L'entrée ne peut pas être vide."
 msgstr "L'entrée ne peut pas être vide."
 
-#: src/app.py:513
+#: src/app.py:520
 msgid "Entrée ajoutée à l'historique du patient."
 msgstr "Entrée ajoutée à l'historique du patient."
 
-#: src/app.py:524
+#: src/app.py:531
 msgid "Réservé au patient."
 msgstr "Réservé au patient."
 
-#: src/app.py:533
+#: src/app.py:540
 msgid "Aucun dossier associé à votre compte."
 msgstr "Aucun dossier associé à votre compte."
 
-#: src/app.py:744
+#: src/app.py:751
 msgid "Action réservée à l'administrateur"
 msgstr "Action réservée à l'administrateur"
 
-#: src/app.py:761
+#: src/app.py:768
 msgid "Mot de passe administrateur incorrect."
 msgstr "Mot de passe administrateur incorrect."
 
-#: src/app.py:765
+#: src/app.py:772
 msgid "Catégorie de motif invalide ou manquante."
 msgstr "Catégorie de motif invalide ou manquante."
 
-#: src/app.py:769
+#: src/app.py:776
 msgid "Le motif doit contenir au moins 10 caractères."
 msgstr "Le motif doit contenir au moins 10 caractères."
 
-#: src/app.py:771
+#: src/app.py:778
 msgid "Le motif n'est pas suffisamment explicite."
 msgstr "Le motif n'est pas suffisamment explicite."
 
-#: src/app.py:773
+#: src/app.py:780
 msgid "Le motif doit être une justification (au moins 3 mots)."
 msgstr "Le motif doit être une justification (au moins 3 mots)."
 
-#: src/app.py:803
+#: src/app.py:810
 #, python-format
 msgid "Compte %(user)s débloqué"
 msgstr "Compte %(user)s débloqué"
 
-#: src/app.py:851
+#: src/app.py:858
 msgid "Conforme — Système hautement sécurisé"
 msgstr "Conforme — Système hautement sécurisé"
 
-#: src/app.py:853
+#: src/app.py:860
 msgid "Avertissement — Des vulnérabilités sont présentes"
 msgstr "Avertissement — Des vulnérabilités sont présentes"
 
-#: src/app.py:855
+#: src/app.py:862
 msgid "Non conforme — Action corrective requise"
 msgstr "Non conforme — Action corrective requise"
 

@@ -11,7 +11,7 @@ from database import (
 )
 
 from classifier import classify_dossier
-from encryption import encrypt_dossier, decrypt_dossier
+from encryption import encrypt_dossier, decrypt_dossier, dechiffrer_si_chiffre
 from rbac import User, check_access
 from audit_log import log_access
 
@@ -106,10 +106,12 @@ def process_dossier(patient_id: int, username: str, permission: str) -> dict:
             dossier_id=dossier["id"],
             encrypted_diagnostic=dossier_chiffre.get("diagnostic", dossier["diagnostic"]),
             encrypted_medicaments=dossier_chiffre.get("medicaments", dossier["medicaments"]),
-            sensitivity_level=classification["global_sensitivity"]
+            sensitivity_level=classification["global_sensitivity"],
+            encrypted_notes=dossier_chiffre.get("notes", dossier["notes"])
         )
         dossier["diagnostic"] = dossier_chiffre.get("diagnostic", dossier["diagnostic"])
         dossier["medicaments"] = dossier_chiffre.get("medicaments", dossier["medicaments"])
+        dossier["notes"] = dossier_chiffre.get("notes", dossier["notes"])
         dossier["is_encrypted"] = 1
 
     # 8. Version chiffrée (telle qu'en base) — preuve du stockage sécurisé
@@ -143,6 +145,6 @@ def process_dossier(patient_id: int, username: str, permission: str) -> dict:
         "is_encrypted": bool(dossier.get("is_encrypted")),
         "donnees_chiffrees": donnees_chiffrees,
         "donnees_dechiffrees": donnees_dechiffrees,
-        "notes": dossier.get("notes"),
+        "notes": dechiffrer_si_chiffre(dossier.get("notes")),
         "sensitivity_level": dossier.get("sensitivity_level")
     }

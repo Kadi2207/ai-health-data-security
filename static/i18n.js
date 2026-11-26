@@ -33,6 +33,7 @@
         "Connexion — mot de passe validé": "Login — password verified",
         "Connexion 2FA réussie": "2FA login successful",
         "Échec connexion — mot de passe incorrect": "Login failed — incorrect password",
+        "Échec connexion — utilisateur introuvable": "Login failed — unknown user",
         "Échec connexion 2FA": "2FA login failed",
         "Tentative connexion sur compte bloqué": "Login attempt on a blocked account",
         "Échec 2FA — mot de passe non validé au préalable": "2FA failed — password not verified beforehand",
