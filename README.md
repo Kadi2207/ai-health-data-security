@@ -47,7 +47,7 @@ Chaque ligne a été vérifiée dans le code et dans `data/model.pkl`, pas dans 
 | Interface bilingue FR / EN | couvert | `translations/` (Flask-Babel), `static/i18n.js` |
 | Thème clair / sombre | couvert | `static/theme.js` (choix mémorisé, sinon préférence du système) |
 | Échappement des données affichées (protection XSS) | couvert | `static/ui.js` (`esc`) |
-| Tests automatisés | partiel | 28 tests (`tests/`), tous réussis en local ; aucune intégration continue. |
+| Tests automatisés | partiel | 31 tests (`tests/`), tous réussis en local ; aucune intégration continue. |
 | Message de connexion unique (anti-énumération) | couvert | `src/app.py` (`api_login`) : « Identifiant ou mot de passe incorrect. » dans tous les cas, le motif réel restant dans le journal d'audit ; `tests/test_ameliorations.py` |
 
 ### Prochaines étapes
@@ -154,7 +154,7 @@ Le tableau de bord affiche les alertes et les blocages en temps réel.
     pip install pytest
     python -m pytest tests
 
-Résultat au 2026-11-27, en local : 28 tests réussis sur 28 (classification, chiffrement, chiffrement des notes en base, export PDF, message de connexion). Les tests demandent une `SECRET_KEY` valide dans `.env`. Ceux de `tests/test_ameliorations.py` créent une base PostgreSQL temporaire, puis la suppriment ; la base de l'application n'est jamais touchée, et sans serveur PostgreSQL joignable ces tests sont ignorés. Aucune intégration continue ne les relance pour l'instant.
+Résultat au 2026-11-27, en local : 31 tests réussis sur 31 (classification, chiffrement, chiffrement des notes en base, affichage d'un dossier dont un seul champ est chiffré, export PDF, message de connexion). Les tests demandent une `SECRET_KEY` valide dans `.env`. Ceux de `tests/test_ameliorations.py` créent une base PostgreSQL temporaire, puis la suppriment ; la base de l'application n'est jamais touchée, et sans serveur PostgreSQL joignable ces tests sont ignorés. Aucune intégration continue ne les relance pour l'instant.
 
 ### Traductions
 

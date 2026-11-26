@@ -531,7 +531,7 @@ def api_mon_dossier():
         return jsonify({"success": False, "reason": _("Réservé au patient.")}), 403
 
     from database import get_patient_id_of_user, get_dossier_by_patient, get_entrees_by_patient
-    from encryption import decrypt_dossier, dechiffrer_si_chiffre
+    from encryption import dechiffrer_si_chiffre
 
     username = session.get("username")
     patient_id = get_patient_id_of_user(username)
@@ -546,12 +546,10 @@ def api_mon_dossier():
     if dossier:
         dossier = dict(dossier)
         if dossier.get("is_encrypted"):
-            dechiffre = decrypt_dossier(
-                {"diagnostic": dossier.get("diagnostic", ""), "medicaments": dossier.get("medicaments", "")},
-                ["diagnostic", "medicaments"]
-            )
-            dossier["diagnostic"] = dechiffre.get("diagnostic", dossier["diagnostic"])
-            dossier["medicaments"] = dechiffre.get("medicaments", dossier["medicaments"])
+            # Seuls les champs classés sensibles sont chiffrés : un champ resté
+            # en clair s'affiche tel quel au lieu de « [Erreur déchiffrement] »
+            dossier["diagnostic"] = dechiffrer_si_chiffre(dossier.get("diagnostic"))
+            dossier["medicaments"] = dechiffrer_si_chiffre(dossier.get("medicaments"))
         historique.append({
             "type": "Dossier initial",
             "diagnostic": dossier["diagnostic"],
@@ -567,12 +565,8 @@ def api_mon_dossier():
     for e in entrees:
         e = dict(e)
         if e.get("is_encrypted"):
-            dechiffre = decrypt_dossier(
-                {"diagnostic": e.get("diagnostic", ""), "medicaments": e.get("medicaments", "")},
-                ["diagnostic", "medicaments"]
-            )
-            e["diagnostic"] = dechiffre.get("diagnostic", e["diagnostic"])
-            e["medicaments"] = dechiffre.get("medicaments", e["medicaments"])
+            e["diagnostic"] = dechiffrer_si_chiffre(e.get("diagnostic"))
+            e["medicaments"] = dechiffrer_si_chiffre(e.get("medicaments"))
         historique.append({
             "type": "Entrée ajoutée",
             "diagnostic": e["diagnostic"],
@@ -600,7 +594,7 @@ def api_historique(patient_id):
         return jsonify({"success": False, "reason": _("Réservé au médecin.")}), 403
 
     from database import get_entrees_by_patient, get_dossier_by_patient
-    from encryption import decrypt_dossier, dechiffrer_si_chiffre
+    from encryption import dechiffrer_si_chiffre
 
     historique = []
 
@@ -609,12 +603,10 @@ def api_historique(patient_id):
     if dossier:
         dossier = dict(dossier)
         if dossier.get("is_encrypted"):
-            dechiffre = decrypt_dossier(
-                {"diagnostic": dossier.get("diagnostic", ""), "medicaments": dossier.get("medicaments", "")},
-                ["diagnostic", "medicaments"]
-            )
-            dossier["diagnostic"] = dechiffre.get("diagnostic", dossier["diagnostic"])
-            dossier["medicaments"] = dechiffre.get("medicaments", dossier["medicaments"])
+            # Seuls les champs classés sensibles sont chiffrés : un champ resté
+            # en clair s'affiche tel quel au lieu de « [Erreur déchiffrement] »
+            dossier["diagnostic"] = dechiffrer_si_chiffre(dossier.get("diagnostic"))
+            dossier["medicaments"] = dechiffrer_si_chiffre(dossier.get("medicaments"))
         historique.append({
             "id": f"initial-{dossier['id']}",
             "type": "Dossier initial",
@@ -631,12 +623,8 @@ def api_historique(patient_id):
     for e in entrees:
         e = dict(e)
         if e.get("is_encrypted"):
-            dechiffre = decrypt_dossier(
-                {"diagnostic": e.get("diagnostic", ""), "medicaments": e.get("medicaments", "")},
-                ["diagnostic", "medicaments"]
-            )
-            e["diagnostic"] = dechiffre.get("diagnostic", e["diagnostic"])
-            e["medicaments"] = dechiffre.get("medicaments", e["medicaments"])
+            e["diagnostic"] = dechiffrer_si_chiffre(e.get("diagnostic"))
+            e["medicaments"] = dechiffrer_si_chiffre(e.get("medicaments"))
         historique.append({
             "id": e["id"],
             "type": "Entrée ajoutée",

@@ -57,10 +57,10 @@ def est_chiffre(valeur) -> bool:
 def dechiffrer_si_chiffre(valeur):
     """Déchiffre un champ seulement s'il est chiffré.
 
-    Sert au champ « notes » : comme le diagnostic et les médicaments, il n'est
-    chiffré que s'il est classé sensible, mais une note non sensible reste en
-    clair dans un dossier chiffré. Un jeton altéré donne « [Erreur déchiffrement] »,
-    comme avec decrypt_dossier."""
+    Sert à l'affichage du diagnostic, des médicaments et des notes : chacun
+    n'est chiffré que s'il est classé sensible, donc un dossier chiffré peut
+    contenir un champ resté en clair, qui est renvoyé tel quel. Un jeton altéré
+    donne « [Erreur déchiffrement] », comme avec decrypt_dossier."""
     if not est_chiffre(valeur):
         return valeur
     return decrypt_dossier({"valeur": valeur}, ["valeur"])["valeur"]

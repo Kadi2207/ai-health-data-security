@@ -196,6 +196,57 @@ def test_migration_chiffre_les_notes_sensibles_restees_en_clair(appli):
     assert _ligne("SELECT notes FROM dossiers_medicaux WHERE id = %s", (sensible["id"],))["notes"] == premier
 
 
+def _dossier_mixte(diagnostic_en_base, medicaments_en_base):
+    patient = _executer("INSERT INTO patients (nom, prenom, date_naissance, nir) "
+                        "VALUES ('Mixte', 'Dossier', '01/01/1975', '175017500000000') RETURNING id")
+    _executer("INSERT INTO dossiers_medicaux (patient_id, diagnostic, medicaments, notes, is_encrypted) "
+              "VALUES (%s, %s, %s, '', 1)", (patient["id"], diagnostic_en_base, medicaments_en_base))
+    return patient["id"]
+
+
+def test_champ_reste_en_clair_dans_un_dossier_chiffre_s_affiche_tel_quel(client, appli):
+    from encryption import encrypt
+    diagnostic = "Patient séropositif VIH sous traitement"
+    medicaments = "Paracétamol 500mg"
+    patient_id = _dossier_mixte(encrypt(diagnostic), medicaments)
+
+    _ouvrir_session(client, appli, "medecin_test", "medecin")
+    entree = client.get(f"/api/historique/{patient_id}").get_json()["entrees"][0]
+    assert entree["diagnostic"] == diagnostic
+    assert entree["medicaments"] == medicaments
+
+    # Même affichage pour le patient lui-même
+    username = f"patient_{uuid.uuid4().hex[:6]}"
+    database.insert_utilisateur("Mixte", "Dossier", "patient", username, patient_id)
+    _ouvrir_session(client, appli, username, "patient")
+    entree = client.get("/api/mon-dossier").get_json()["entrees"][0]
+    assert entree["diagnostic"] == diagnostic
+    assert entree["medicaments"] == medicaments
+
+
+def test_entree_avec_un_seul_champ_chiffre_s_affiche_correctement(client, appli):
+    from encryption import encrypt
+    patient_id = _dossier_mixte("Consultation de routine", "")
+    _executer("INSERT INTO entrees_dossier (patient_id, diagnostic, medicaments, notes, medecin_auteur, is_encrypted) "
+              "VALUES (%s, %s, %s, '', 'medecin_test', 1)",
+              (patient_id, "Contrôle annuel", encrypt("Méthadone 40mg")))
+    _ouvrir_session(client, appli, "medecin_test", "medecin")
+    entrees = client.get(f"/api/historique/{patient_id}").get_json()["entrees"]
+    ajoutee = next(e for e in entrees if e["type"] == "Entrée ajoutée")
+    assert ajoutee["diagnostic"] == "Contrôle annuel"
+    assert ajoutee["medicaments"] == "Méthadone 40mg"
+
+
+def test_jeton_altere_reste_signale(client, appli):
+    from encryption import encrypt
+    jeton = encrypt("Cancer du poumon")
+    patient_id = _dossier_mixte(jeton[:-6] + "AAAAAA", "Aucun")
+    _ouvrir_session(client, appli, "medecin_test", "medecin")
+    entree = client.get(f"/api/historique/{patient_id}").get_json()["entrees"][0]
+    assert entree["diagnostic"] == "[Erreur déchiffrement]"
+    assert entree["medicaments"] == "Aucun"
+
+
 # ── 2. Export PDF du rapport de conformité ────────────────────────────────────
 def test_rapport_pdf_renvoie_un_pdf_pour_un_admin_connecte(client, appli):
     _ouvrir_session(client, appli, "admin_test", "admin")

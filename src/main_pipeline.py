@@ -11,7 +11,7 @@ from database import (
 )
 
 from classifier import classify_dossier
-from encryption import encrypt_dossier, decrypt_dossier, dechiffrer_si_chiffre
+from encryption import encrypt_dossier, dechiffrer_si_chiffre
 from rbac import User, check_access
 from audit_log import log_access
 
@@ -121,13 +121,11 @@ def process_dossier(patient_id: int, username: str, permission: str) -> dict:
     }
 
     # 9. Déchiffrement pour l'utilisateur autorisé — preuve du cycle complet
-    donnees_dechiffrees = decrypt_dossier(
-        {
-            "diagnostic": dossier.get("diagnostic", ""),
-            "medicaments": dossier.get("medicaments", "")
-        },
-        ["diagnostic", "medicaments"]
-    )
+    # Un champ non sensible resté en clair est renvoyé tel quel
+    donnees_dechiffrees = {
+        "diagnostic": dechiffrer_si_chiffre(dossier.get("diagnostic", "")),
+        "medicaments": dechiffrer_si_chiffre(dossier.get("medicaments", ""))
+    }
 
     # 10. Retourner le résultat complet
     return {
