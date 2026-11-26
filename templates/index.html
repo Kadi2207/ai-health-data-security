@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="{{ current_lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ _("TCIM — Sécurisation des Données de Santé") }}</title>
+    <script src="/static/theme.js"></script>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/ui.js"></script>
+    <script src="/static/i18n.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+</head>
+<body data-role="{{ current_role }}">
+
+<!-- Jeu d'icônes (trait, couleur héritée du texte via currentColor) -->
+<svg class="svg-sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 16v-4M12 16V8M17 16v-7"/></symbol>
+    <symbol id="i-clipboard" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M12 11v6M9 14h6"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M10 8l6 4-6 4z"/></symbol>
+    <symbol id="i-activity" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></symbol>
+    <symbol id="i-shield-check" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></symbol>
+    <symbol id="i-shield-alert" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4M12 16h.01"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+    <symbol id="i-unlock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-save" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></symbol>
+    <symbol id="i-cpu" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></symbol>
+    <symbol id="i-key" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="M11.4 11.6L21 2M16 7l3 3M19 4l2 2"/></symbol>
+    <symbol id="i-pen" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
+    <symbol id="i-history" viewBox="0 0 24 24"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></symbol>
+</svg>
+
+{% set show_lang = true %}
+{% set show_logout = true %}
+{# Libellé d'affichage du rôle (la valeur technique current_role reste inchangée) #}
+{% set role_labels = {
+    'admin': _('Administrateur'),
+    'medecin': _('Médecin'),
+    'infirmier': _('Infirmier'),
+    'patient': _('Patient')
+} %}
+{% set role_label = role_labels.get(current_role, current_role) %}
+{% include "_header.html" %}
+
+<main>
+
+    {% if current_role == 'admin' %}
+    <!-- ===== DASHBOARD ===== -->
+    <section class="card" id="dashboard-section">
+        <h2><svg class="icon"><use href="#i-chart"/></svg>{{ _("Dashboard — Statistiques en Temps Réel") }}</h2>
+        <div class="kpi-grid">
+            <div class="kpi kpi--info">
+                <div class="kpi__head"><span class="kpi__icon"><svg class="icon"><use href="#i-folder"/></svg></span>{{ _("Total dossiers") }}</div>
+                <div class="kpi__value" id="count-dossiers"><span class="skeleton skeleton--value"></span></div>
+                <div class="kpi__sub"></div>
+            </div>
+            <div class="kpi kpi--success">
+                <div class="kpi__head"><span class="kpi__icon"><svg class="icon"><use href="#i-lock"/></svg></span>{{ _("Dossiers chiffrés") }}</div>
+                <div class="kpi__value" id="count-chiffres"><span class="skeleton skeleton--value"></span></div>
+                <div class="kpi__sub" id="count-chiffres-sub"></div>
+            </div>
+            <div class="kpi kpi--accent">
+                <div class="kpi__head"><span class="kpi__icon"><svg class="icon"><use href="#i-clock"/></svg></span>{{ _("Accès aujourd'hui") }}</div>
+                <div class="kpi__value" id="count-acces"><span class="skeleton skeleton--value"></span></div>
+                <div class="kpi__sub"></div>
+            </div>
+            <div class="kpi kpi--danger" id="kpi-alertes">
+                <div class="kpi__head"><span class="kpi__icon"><svg class="icon"><use href="#i-alert"/></svg></span>{{ _("Alertes actives") }}</div>
+                <div class="kpi__value" id="count-alertes"><span class="skeleton skeleton--value"></span></div>
+                <div class="kpi__sub"></div>
+            </div>
+        </div>
+        <div class="chart-grid">
+            <div class="chart-panel">
+                <h3 id="chart-camembert-title">{{ _("Répartition par sensibilité") }}</h3>
+                <div class="chart-box chart-box--donut is-loading" id="chart-camembert-box">
+                    <canvas id="chart-camembert" role="img" aria-labelledby="chart-camembert-title"></canvas>
+                    <div class="chart-center">
+                        <span class="chart-center__value" id="chart-camembert-total"></span>
+                        <span class="chart-center__label">{{ _("Total dossiers") }}</span>
+                    </div>
+                </div>
+                <div class="chart-empty" id="chart-camembert-empty" hidden></div>
+                <ul class="chart-legend" id="chart-camembert-legend"></ul>
+            </div>
+            <div class="chart-panel">
+                <h3 id="chart-barres-title">{{ _("Accès accordés vs refusés par rôle") }}</h3>
+                <div class="chart-box is-loading" id="chart-barres-box">
+                    <canvas id="chart-barres" role="img" aria-labelledby="chart-barres-title"></canvas>
+                </div>
+                <div class="chart-empty" id="chart-barres-empty" hidden></div>
+                <ul class="chart-legend" id="chart-barres-legend"></ul>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if current_role == 'medecin' %}
+    <!-- ===== HISTORIQUE & AJOUT D'ENTRÉE (MÉDECIN) ===== -->
+    <section class="card">
+        <h2><svg class="icon"><use href="#i-clipboard"/></svg>{{ _("Dossier patient — Historique médical") }}</h2>
+        <div class="user-chip">
+            <span class="avatar">{{ current_role[0]|upper }}</span>
+            <span class="user-chip__name">{{ current_user }}</span>
+            <span class="user-chip__role">{{ role_label }}</span>
+        </div>
+        <p class="card__intro">{{ _("Consultez l'historique d'un patient et ajoutez une nouvelle entrée. Les entrées passées ne sont jamais modifiées.") }}</p>
+
+        <div class="form-group">
+            <label for="patient-hist">{{ _("Sélectionner un patient") }}</label>
+            <select id="patient-hist" name="patient-hist" onchange="chargerHistorique()">
+                <option value="">{{ _("-- Choisir un patient --") }}</option>
+                {% for p in patients %}
+                <option value="{{ p.id }}">#{{ p.id }} — {{ p.nom }} {{ p.prenom }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div id="historique-section" style="display:none;">
+            <h3 class="section-title"><svg class="icon"><use href="#i-history"/></svg>{{ _("Historique des entrées") }}</h3>
+            <div id="historique-content"></div>
+        </div>
+
+        <hr class="divider">
+
+        <h3 class="section-title"><svg class="icon"><use href="#i-plus"/></svg>{{ _("Ajouter une nouvelle entrée") }}</h3>
+        <form id="entree-form">
+            <div class="form-group">
+                <label for="e-diagnostic">{{ _("Diagnostic") }}</label>
+                <textarea id="e-diagnostic" rows="2" placeholder="{{ _('Diagnostic de cette consultation') }}"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="e-medicaments">{{ _("Médicaments") }}</label>
+                <textarea id="e-medicaments" rows="2" placeholder="{{ _('Traitements prescrits') }}"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="e-notes">{{ _("Notes") }}</label>
+                <textarea id="e-notes" rows="2" placeholder="{{ _('Observations complémentaires') }}"></textarea>
+            </div>
+            <button type="submit" class="btn-primary btn-block"><svg class="icon"><use href="#i-save"/></svg>{{ _("Ajouter au dossier") }}</button>
+        </form>
+    </section>
+    {% endif %}
+
+    {% if current_role == 'patient' %}
+    <!-- ===== VUE PATIENT — MON DOSSIER (LECTURE SEULE) ===== -->
+    <section class="card">
+        <h2><svg class="icon"><use href="#i-file"/></svg>{{ _("Mon dossier médical") }}</h2>
+        <div class="user-chip">
+            <span class="avatar">{{ current_role[0]|upper }}</span>
+            <span class="user-chip__name">{{ current_user }}</span>
+            <span class="user-chip__role">{{ role_label }}</span>
+        </div>
+        <p class="card__intro">{{ _("Vous consultez votre dossier médical en lecture seule. Vos données sont chiffrées et sécurisées.") }}</p>
+
+        <div id="mon-dossier-content">
+            <div class="state state--inline" role="status"><span class="spinner"></span>{{ _("Chargement de votre dossier...") }}</div>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if current_role == 'admin' %}
+    <section class="card">
+        <h2><svg class="icon"><use href="#i-play"/></svg>{{ _("Tester le Pipeline") }}</h2>
+        <form id="pipeline-form">
+            <div class="form-group">
+                <label for="patient_id">{{ _("Patient ID") }}</label>
+                <select id="patient_id" name="patient_id">
+                    {% for p in patients %}
+                    <option value="{{ p.id }}">#{{ p.id }} — {{ p.nom }} {{ p.prenom }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>{{ _("Utilisateur connecté") }}</label>
+                <div class="user-chip">
+                    <span class="avatar">{{ current_role[0]|upper }}</span>
+                    <span class="user-chip__name">{{ current_user }}</span>
+                    <span class="user-chip__role">{{ role_label }}</span>
+                </div>
+                <input type="hidden" id="username" value="{{ current_user }}">
+            </div>
+            <div class="form-group">
+                <label for="permission">{{ _("Permission demandée") }}</label>
+                <select id="permission" name="permission">
+                    <option value="read_dossier">read_dossier</option>
+                    <option value="write_dossier">write_dossier</option>
+                    <option value="delete_dossier">delete_dossier</option>
+                    <option value="read_logs">read_logs</option>
+                    <option value="manage_users">manage_users</option>
+                </select>
+            </div>
+            <button type="submit" class="btn-primary btn-block"><svg class="icon"><use href="#i-play"/></svg>{{ _("Lancer le pipeline") }}</button>
+        </form>
+    </section>
+    {% endif %}
+
+    <section class="card" id="result-section" style="display:none;">
+        <h2><svg class="icon"><use href="#i-activity"/></svg>{{ _("Résultat") }}</h2>
+        <div id="result-content"></div>
+    </section>
+
+    {% if current_role == 'admin' %}
+    <section class="card" id="rgpd-section">
+        <h2><svg class="icon"><use href="#i-shield-check"/></svg>{{ _("Tableau de Bord Conformité RGPD") }}</h2>
+        <div class="compliance-head">
+            <div id="score-badge-container" class="score-badge">
+                {{ _("Score :") }} <span id="rgpd-score-global">--</span>%
+            </div>
+            <div class="compliance-head__text">
+                <p id="rgpd-message" class="lead">{{ _("Chargement du score en temps réel...") }}</p>
+                <p class="muted">{{ _("Pondération réglementaire : Chiffrement (30%%), Logs (30%%), RBAC (20%%), Données obligatoires (20%%)") }}</p>
+            </div>
+            <div class="compliance-head__action">
+                <a href="/rapport-pdf" class="btn-primary"><svg class="icon"><use href="#i-download"/></svg>{{ _("Télécharger le Rapport PDF") }}</a>
+            </div>
+        </div>
+        <div class="metric-grid">
+            <div class="metric">
+                <span class="label">{{ _("Chiffrement (Fernet)") }}</span>
+                <span class="value" id="score-chiffrement"><span class="skeleton skeleton--metric"></span></span>
+            </div>
+            <div class="metric">
+                <span class="label">{{ _("Traçabilité & Logs d'Audit") }}</span>
+                <span class="value" id="score-logs"><span class="skeleton skeleton--metric"></span></span>
+            </div>
+            <div class="metric">
+                <span class="label">{{ _("Respect Politique RBAC") }}</span>
+                <span class="value" id="score-rbac"><span class="skeleton skeleton--metric"></span></span>
+            </div>
+            <div class="metric">
+                <span class="label">{{ _("Mentions Obligatoires") }}</span>
+                <span class="value" id="score-obligatoire"><span class="skeleton skeleton--metric"></span></span>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if current_role == 'admin' %}
+    <section class="card card--alert">
+        <h2><svg class="icon"><use href="#i-shield-alert"/></svg>{{ _("Centre de Sécurité — Détection d'Intrusion") }}</h2>
+        <div class="kpi-grid kpi-grid--2">
+            <div class="kpi kpi--danger" id="kpi-sec-alertes">
+                <div class="kpi__head"><span class="kpi__icon"><svg class="icon"><use href="#i-alert"/></svg></span>{{ _("Alertes de sécurité actives") }}</div>
+                <div class="kpi__value" id="sec-alertes"><span class="skeleton skeleton--value"></span></div>
+            </div>
+            <div class="kpi" id="kpi-sec-bloques">
+                <div class="kpi__head"><span class="kpi__icon"><svg class="icon"><use href="#i-lock"/></svg></span>{{ _("Comptes bloqués") }}</div>
+                <div class="kpi__value" id="sec-bloques"><span class="skeleton skeleton--value"></span></div>
+            </div>
+        </div>
+        <div class="toolbar">
+            <button type="button" class="btn-secondary" id="btn-scan-securite" onclick="loadSecurity()"><svg class="icon"><use href="#i-refresh"/></svg>{{ _("Lancer un scan de sécurité") }}</button>
+        </div>
+        <h3 class="section-title">{{ _("Menaces détectées") }}</h3>
+        <div id="alerts-content">
+            <div class="skeleton-rows" aria-busy="true"><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span></div>
+        </div>
+        <h3 class="section-title">{{ _("Comptes bloqués") }}</h3>
+        <div id="blocked-content">
+            <div class="skeleton-rows" aria-busy="true"><span class="skeleton"></span><span class="skeleton"></span></div>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if current_role == 'admin' %}
+    <section class="card">
+        <h2><svg class="icon"><use href="#i-list"/></svg>{{ _("Logs d'audit") }}</h2>
+        <div class="toolbar">
+            <button type="button" class="btn-secondary" id="btn-actualiser-logs" onclick="loadLogs()"><svg class="icon"><use href="#i-refresh"/></svg>{{ _("Actualiser les logs") }}</button>
+        </div>
+        <div id="logs-content">
+            <div class="skeleton-rows" aria-busy="true"><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span></div>
+        </div>
+    </section>
+    {% endif %}
+
+</main>
+
+<script>
+// ── Dictionnaire de traductions JavaScript (Chantier B) ──────────────────────
+// La langue courante est fournie par le serveur (Flask/Babel)
+const LANG = "{{ current_lang }}";
+
+const TRADUCTIONS = {
+    en: {
+        // Messages génériques
+        "Chargement...": "Loading...",
+        "Erreur de chargement.": "Loading error.",
+        "Aucun log enregistré.": "No log recorded.",
+        "Aucune menace détectée. Le système est intègre.": "No threat detected. The system is intact.",
+        "Aucun compte bloqué.": "No blocked account.",
+        "Aucune entrée pour ce patient. Ajoutez la première ci-dessous.": "No entry for this patient. Add the first one below.",
+        "Votre dossier est vide pour le moment.": "Your record is empty for now.",
+
+        // En-têtes de tableau — logs d'audit
+        "Horodatage": "Timestamp",
+        "Utilisateur": "User",
+        "Rôle": "Role",
+        "Action": "Action",
+        "Ressource": "Resource",
+        "Résultat": "Result",
+
+        // En-têtes de tableau — sécurité
+        "ID": "ID",
+        "Gravité": "Severity",
+        "Incident": "Incident",
+        "Statut": "Status",
+
+        // Gravités
+        "CRITIQUE": "CRITICAL",
+        "ÉLEVÉ": "HIGH",
+        "MOYEN": "MEDIUM",
+
+        // Comptes bloqués
+        "Bloqué": "Blocked",
+        "Débloquer": "Unblock",
+
+        // Graphiques et indicateurs
+        "Accordés": "Granted",
+        "Refusés": "Denied",
+        "Élevée": "High",
+        "Moyenne": "Medium",
+        "Faible": "Low",
+        "du total": "of total",
+        "Aucune donnée à afficher.": "No data to display.",
+        "Les statistiques apparaîtront dès les premiers accès.": "Statistics will appear after the first accesses.",
+        "Réessayez dans un instant.": "Please try again in a moment.",
+        "enregistrement(s)": "record(s)",
+
+        // Rôles (libellés d'affichage)
+        "Administrateur": "Administrator",
+        "Médecin": "Doctor",
+        "Infirmier": "Nurse",
+        "Patient": "Patient",
+        "Inconnu": "Unknown",
+
+        // Résultat du pipeline
+        "Permission": "Permission",
+        "Accès": "Access",
+        "ACCORDÉ": "GRANTED",
+        "REFUSÉ": "DENIED",
+        "Sensibilité globale": "Overall sensitivity",
+        "Score de classification": "Classification score",
+        "Champs sensibles détectés": "Sensitive fields detected",
+        "Aucun": "None",
+        "Données chiffrées": "Encrypted data",
+        "pts": "pts",
+        "Moteur IA — Architecture 3 couches": "AI Engine — 3-Layer Architecture",
+        "Layer 1 : règles déterministes (NIR, dates, mots-clés critiques)": "Layer 1: deterministic rules (SSN, dates, critical keywords)",
+        "Layer 2 : modèle TF-IDF supervisé": "Layer 2: supervised TF-IDF model",
+        "Layer 3 : décision conservative (priorité recall)": "Layer 3: conservative decision (recall priority)",
+        "Accuracy corpus synthétique :": "Synthetic corpus accuracy:",
+        "Démonstration du chiffrement (Fernet)": "Encryption demonstration (Fernet)",
+        "Donnée telle que stockée en base (chiffrée)": "Data as stored in the database (encrypted)",
+        "Donnée déchiffrée pour l'utilisateur autorisé": "Data decrypted for the authorized user",
+
+        // Historique / dossier
+        "Dossier initial": "Initial record",
+        "Entrée ajoutée": "Added entry",
+        "Consultation": "Consultation",
+        "Dossier d'origine": "Original record",
+        "Rédigé par votre médecin": "Written by your doctor",
+        "Diagnostic": "Diagnosis",
+        "Médicaments": "Medications",
+        "Notes": "Notes",
+        "Entrée": "Entry",
+        "Système (dossier initial)": "System (initial record)",
+        "multi-comptes": "multiple accounts",
+        "Données sensibles chiffrées automatiquement (sensibilité :": "Sensitive data automatically encrypted (sensitivity:",
+        "Aucune donnée sensible détectée": "No sensitive data detected",
+        "Oui — Fernet (AES-128-CBC + HMAC-SHA256)": "Yes — Fernet (AES-128-CBC + HMAC-SHA256)",
+        "Non": "No",
+
+        // Alertes JS
+        "Veuillez d'abord sélectionner un patient.": "Please select a patient first.",
+        "Mot de passe administrateur requis.": "Administrator password required.",
+        "Veuillez choisir une catégorie.": "Please choose a category.",
+        "Un motif détaillé est obligatoire.": "A detailed reason is required.",
+        "Compte débloqué. ": "Account unblocked. ",
+        "Échec : ": "Failed: ",
+        "Erreur : ": "Error: "
+    }
+};
+
+// Fonction de traduction : si on est en anglais et que le texte existe
+// dans le dictionnaire, on renvoie la version anglaise, sinon le texte français.
+function t(texte) {
+    // hasOwnProperty : une donnée serveur comme « constructor » ne doit pas
+    // remonter une propriété héritée de l'objet.
+    if (LANG === "en" && Object.prototype.hasOwnProperty.call(TRADUCTIONS.en, texte)) {
+        return TRADUCTIONS.en[texte];
+    }
+    return texte;
+}
+
+// ── Aides d'affichage (présentation uniquement) ─────────────────────────────
+// Icône du jeu SVG défini en haut de page
+function ic(nom) {
+    return '<svg class="icon" aria-hidden="true"><use href="#i-' + nom + '"/></svg>';
+}
+
+// Niveau de sensibilité -> suffixe de classe (même règle que l'ancien code couleur)
+function niveauSensibilite(niveau) {
+    return niveau === "high" ? "high" : niveau === "medium" ? "medium" : "low";
+}
+
+// Lecture d'une variable CSS du thème courant
+function cssVar(nom) {
+    return getComputedStyle(document.documentElement).getPropertyValue(nom).trim();
+}
+
+// Libellés d'affichage (les valeurs techniques restent inchangées)
+const LIBELLES_SENSIBILITE = { high: "Élevée", medium: "Moyenne", low: "Faible" };
+const LIBELLES_ROLE = { admin: "Administrateur", medecin: "Médecin", infirmier: "Infirmier", patient: "Patient", inconnu: "Inconnu" };
+const ORDRE_SENSIBILITE = ["high", "medium", "low"];
+const ORDRE_ROLES = ["admin", "medecin", "infirmier", "patient"];
+
+function libelleSensibilite(cle) {
+    if (LIBELLES_SENSIBILITE[cle]) return t(LIBELLES_SENSIBILITE[cle]);
+    const s = String(cle || "—");
+    return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function libelleRole(role) {
+    if (!role) return "—";
+    return LIBELLES_ROLE[role] ? t(LIBELLES_ROLE[role]) : role;
+}
+
+// ── Sécurité d'affichage (anti-XSS) ─────────────────────────────────────────
+// Toute donnée dynamique (serveur ou saisie) est échappée par esc() avant
+// d'être insérée dans le DOM via innerHTML. Les textes affichés dans les
+// notifications passent par textContent (voir static/ui.js).
+const esc = MSPUI.esc;
+
+// Notification temporaire (remplace les alert() et les messages en ligne)
+function toast(type, titre, message) {
+    MSPToast.show({ type: type, title: titre, message: message });
+}
+
+// États d'interface : chargement, vide, succès, erreur (textes échappés)
+function etatChargement(texte) {
+    return `<div class="state state--inline" role="status"><span class="spinner"></span>${esc(texte)}</div>`;
+}
+
+function etatVide(icone, titre, aide, variante) {
+    return `<div class="state ${variante ? "state--" + variante : ""}" role="status">
+        <span class="state__icon">${ic(icone)}</span>
+        <span class="state__title">${esc(titre)}</span>
+        ${aide ? `<span>${esc(aide)}</span>` : ""}
+    </div>`;
+}
+
+function etatErreur(texte) {
+    return etatVide("alert", texte || t("Erreur de chargement."), t("Réessayez dans un instant."), "error");
+}
+
+// Remplace le contenu d'une zone avec une apparition douce
+function afficher(el, html) {
+    el.innerHTML = html;
+    el.classList.remove("fade-in");
+    void el.offsetWidth; // relance l'animation
+    el.classList.add("fade-in");
+}
+
+// Bouton d'actualisation : état occupé pendant le chargement
+function occupe(idBouton, actif) {
+    const b = document.getElementById(idBouton);
+    if (!b) return;
+    b.disabled = actif;
+    b.classList.toggle("is-busy", actif);
+    b.setAttribute("aria-busy", actif ? "true" : "false");
+}
+
+// Indicateur KPI : signale visuellement une valeur d'incident non nulle
+function marquerAlerte(idKpi, valeur) {
+    const k = document.getElementById(idKpi);
+    if (k) k.classList.toggle("is-alert", Number(valeur) > 0);
+}
+</script>
+
+<script>
+const pipelineForm = document.getElementById("pipeline-form");
+if (pipelineForm) {
+pipelineForm.addEventListener("submit", function(e) {
+    e.preventDefault();
+    // Anti-double-clic : bouton désactivé jusqu'à la réponse du serveur
+    const bouton = pipelineForm.querySelector('button[type="submit"]');
+    MSPUI.withBusy(bouton, executerPipeline).catch(err => {
+        console.error("Erreur pipeline:", err);
+        toast("error", t("Erreur de chargement."), t("Réessayez dans un instant."));
+    });
+});
+
+async function executerPipeline() {
+    const patient_id = document.getElementById("patient_id").value;
+    const username = document.getElementById("username").value;
+    const permission = document.getElementById("permission").value;
+
+    const response = await fetch("/process", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ patient_id, username, permission })
+    });
+
+    const data = await response.json();
+
+    if (data.erreur) {
+        toast("error", t("Erreur : ") + MSPI18N.log(data.erreur, LANG));
+        return;
+    }
+
+    const section = document.getElementById("result-section");
+    const content = document.getElementById("result-content");
+    section.style.display = "block";
+
+    const v_user = data.username || username;
+    const v_perm = data.permission || permission;
+
+// Détermine si l'accès est accordé selon la réponse du serveur
+    let estAccorde = true;
+    if (data.access === "refusé" || (data.message && (data.message.toLowerCase().includes("refus") || data.message.toLowerCase().includes("incident") || data.message.toLowerCase().includes("insuffis")))) {
+        estAccorde = false;
+    }
+
+    const accessClass = estAccorde ? "granted" : "refused";
+    const accessIcon = estAccorde ? ic("check") : ic("x");
+    const accessTexte = estAccorde ? "accordé" : "refusé";
+
+    let html = `
+        <div class="result-grid">
+            <div class="result-item">
+                <span class="label">${t("Utilisateur")}</span>
+                <span class="value">${esc(v_user)}</span>
+            </div>
+            <div class="result-item">
+                <span class="label">${t("Permission")}</span>
+                <span class="value">${esc(v_perm)}</span>
+            </div>
+            <div class="result-item">
+                <span class="label">${t("Accès")}</span>
+                <span class="badge ${accessClass}">${accessIcon} ${t(accessTexte.toUpperCase())}</span>
+            </div>
+    `;
+
+    if (estAccorde) {
+        const classif = data.classification || {};
+        const sensitivity = classif.global_sensitivity || "—";
+        const score = classif.total_score || 0;
+        const fields = classif.sensitive_fields || [];
+        const accuracy = classif.model_accuracy || "—";
+        const isEncrypted = data.is_encrypted;
+
+        const sensNiveau = niveauSensibilite(sensitivity);
+
+        html += `
+            <div class="result-item">
+                <span class="label">${t("Sensibilité globale")}</span>
+                <span class="badge badge--${sensNiveau}">${esc(libelleSensibilite(sensitivity))}</span>
+            </div>
+            <div class="result-item">
+                <span class="label">${t("Score de classification")}</span>
+                <span class="value value-strong">${esc(score)} ${t("pts")}</span>
+            </div>
+            <div class="result-item">
+                <span class="label">${t("Champs sensibles détectés")}</span>
+                <span class="value">${fields.length > 0 ? esc(fields.join(", ")) : t("Aucun")}</span>
+            </div>
+            <div class="result-item">
+                <span class="label">${t("Données chiffrées")}</span>
+                <span class="value">${isEncrypted ? ic("lock") + " " + t("Oui — Fernet (AES-128-CBC + HMAC-SHA256)") : ic("unlock") + " " + t("Non")}</span>
+            </div>
+            <div class="result-item full-width">
+                <div class="callout callout--info">
+                    <span class="callout__title">${ic("cpu")} ${t("Moteur IA — Architecture 3 couches")}</span>
+                    <span class="callout__text">
+                        ${t("Layer 1 : règles déterministes (NIR, dates, mots-clés critiques)")} &nbsp;|&nbsp;
+                        ${t("Layer 2 : modèle TF-IDF supervisé")} &nbsp;|&nbsp;
+                        ${t("Layer 3 : décision conservative (priorité recall)")}
+                        &nbsp;&nbsp;—&nbsp;&nbsp; ${t("Accuracy corpus synthétique :")} <b>${esc(accuracy)}%</b>
+                    </span>
+                </div>
+            </div>
+        `;
+
+        const chiffre = data.donnees_chiffrees || {};
+        const dechiffre = data.donnees_dechiffrees || {};
+
+        html += `
+            <div class="result-item full-width">
+                <span class="demo-heading">${ic("key")} ${t("Démonstration du chiffrement (Fernet)")}</span>
+            </div>
+            <div class="result-item full-width">
+                <div class="callout callout--neutral">
+                    <span class="label">${ic("lock")} ${t("Donnée telle que stockée en base (chiffrée)")}</span>
+                    <span class="cipher">${t("Diagnostic")} : ${esc((chiffre.diagnostic || "").substring(0, 60))}...</span>
+                </div>
+            </div>
+            <div class="result-item full-width">
+                <div class="callout callout--success">
+                    <span class="label">${ic("unlock")} ${t("Donnée déchiffrée pour l'utilisateur autorisé")} (${esc(v_user)})</span>
+                    <span class="value">
+                        ${t("Diagnostic")} : ${esc(dechiffre.diagnostic) || "—"}<br>
+                        ${t("Médicaments")} : ${esc(dechiffre.medicaments) || "—"}
+                    </span>
+                </div>
+            </div>
+        `;
+    }
+
+    html += `</div>`;
+    afficher(content, html);
+
+    setTimeout(() => {
+        loadLogs();
+        loadSecurity();
+        loadRgpdScore();
+    }, 300);
+}
+}
+
+async function loadLogs() {
+    const content = document.getElementById("logs-content");
+    occupe("btn-actualiser-logs", true);
+
+    try {
+        const response = await fetch("/logs");
+        const logs = await response.json();
+
+        if (!logs || logs.length === 0) {
+            afficher(content, etatVide("list", t("Aucun log enregistré.")));
+            return;
+        }
+
+        let html = `<p class="table-meta">${logs.length} ${t("enregistrement(s)")}</p>` +
+            "<div class='table-wrap table-wrap--scroll'><table><thead><tr>" +
+            "<th>" + t("Horodatage") + "</th><th>" + t("Utilisateur") + "</th><th>" + t("Rôle") + "</th>" +
+            "<th>" + t("Action") + "</th><th>" + t("Ressource") + "</th><th>" + t("Résultat") + "</th>" +
+            "</tr></thead><tbody>";
+
+        // Les logs sont stockés en français : traduction à l'affichage uniquement
+        // (MSPI18N, static/i18n.js), puis échappement avant insertion.
+        logs.forEach(log => {
+            const cls = (log.resultat === "accordé" || log.resultat === "autorisé" || log.resultat === "granted") ? "granted" : "refused";
+            html += `<tr>
+                <td class="cell-nowrap cell-muted">${esc(log.timestamp)}</td>
+                <td>${esc(log.username)}</td>
+                <td>${esc(libelleRole(log.role))}</td>
+                <td>${esc(MSPI18N.log(log.action, LANG))}</td>
+                <td>${esc(MSPI18N.log(log.ressource, LANG))}</td>
+                <td><span class="badge ${cls}">${esc(MSPI18N.resultat(log.resultat, LANG))}</span></td>
+            </tr>`;
+        });
+
+        html += "</tbody></table></div>";
+        afficher(content, html);
+    } catch (err) {
+        console.error("Erreur logs:", err);
+        afficher(content, etatErreur());
+    } finally {
+        occupe("btn-actualiser-logs", false);
+    }
+}
+
+// Tableau des comptes bloqués (partagé par loadSecurity et rafraichirComptesBloques)
+function renderComptesBloques(comptes) {
+    const blockedContent = document.getElementById("blocked-content");
+    const isAdmin = document.body.getAttribute("data-role") === "admin";
+
+    if (!comptes || comptes.length === 0) {
+        afficher(blockedContent, etatVide("unlock", t("Aucun compte bloqué.")));
+        return;
+    }
+
+    let html = "<div class='table-wrap'><table><thead><tr>" +
+        "<th>" + t("Utilisateur") + "</th><th>" + t("Rôle") + "</th><th>" + t("Statut") + "</th>" +
+        (isAdmin ? "<th class='cell-actions'>" + t("Action") + "</th>" : "") +
+        "</tr></thead><tbody>";
+    comptes.forEach(c => {
+        html += `<tr>
+            <td><b>${esc(c.username)}</b></td>
+            <td>${esc(libelleRole(c.role))}</td>
+            <td><span class="badge refused">${ic("lock")} ${t("Bloqué")}</span></td>
+            ${isAdmin ? `<td class="cell-actions"><button type="button" class="btn-secondary btn-sm" data-unblock="${esc(c.username)}">${ic("unlock")} ${t("Débloquer")}</button></td>` : ""}
+        </tr>`;
+    });
+    html += "</tbody></table></div>";
+    afficher(blockedContent, html);
+}
+
+// Ouverture de la fenêtre de déblocage par délégation d'événement : le nom
+// du compte est lu dans data-unblock, jamais injecté dans du code JavaScript.
+const zoneComptesBloques = document.getElementById("blocked-content");
+if (zoneComptesBloques) {
+    zoneComptesBloques.addEventListener("click", function(e) {
+        const bouton = e.target.closest("[data-unblock]");
+        if (bouton) openUnblockModal(bouton.dataset.unblock);
+    });
+}
+
+async function loadSecurity() {
+    const content = document.getElementById("alerts-content");
+    occupe("btn-scan-securite", true);
+
+    try {
+        const res = await fetch("/security/scan");
+        const data = await res.json();
+
+        document.getElementById("sec-alertes").innerText = data.nouvelles_alertes !== undefined ? "" : "";
+
+        // Recharger les alertes détaillées
+        const alertsRes = await fetch("/alertes");
+        const alerts = await alertsRes.json();
+
+        document.getElementById("sec-alertes").innerText = alerts.length;
+        document.getElementById("sec-bloques").innerText = data.comptes_bloques.length;
+        marquerAlerte("kpi-sec-alertes", alerts.length);
+        marquerAlerte("kpi-sec-bloques", data.comptes_bloques.length);
+
+        if (!alerts || alerts.length === 0) {
+            afficher(content, etatVide("shield-check", t("Aucune menace détectée. Le système est intègre."), "", "success"));
+        } else {
+            let html = `<p class="table-meta">${alerts.length} ${t("enregistrement(s)")}</p>` +
+                "<div class='table-wrap table-wrap--scroll'><table><thead><tr>" +
+                "<th>" + t("ID") + "</th><th>" + t("Gravité") + "</th><th>" + t("Utilisateur") + "</th><th>" + t("Incident") + "</th><th>" + t("Horodatage") + "</th>" +
+                "</tr></thead><tbody>";
+            alerts.forEach(a => {
+                let gravite = t("MOYEN");
+                let classeGravite = "badge--warning";
+                if (a.message.includes("CRITIQUE")) { gravite = t("CRITIQUE"); classeGravite = "badge--solid-danger"; }
+                else if (a.message.includes("ÉLEVÉ")) { gravite = t("ÉLEVÉ"); classeGravite = "badge--danger"; }
+                html += `<tr>
+                    <td class="cell-muted">#${esc(a.id)}</td>
+                    <td><span class="badge ${classeGravite}">${gravite}</span></td>
+                    <td><b>${esc(t(a.username))}</b></td>
+                    <td class="cell-wrap">${esc(MSPI18N.alerte(a.message, LANG))}</td>
+                    <td class="cell-nowrap cell-muted">${esc(a.timestamp)}</td>
+                </tr>`;
+            });
+            html += "</tbody></table></div>";
+            afficher(content, html);
+        }
+
+        // Comptes bloqués
+        renderComptesBloques(data.comptes_bloques);
+    } catch (err) {
+        console.error("Erreur sécurité:", err);
+        afficher(content, etatErreur());
+    } finally {
+        occupe("btn-scan-securite", false);
+    }
+}
+
+let unblockTargetUsername = null;
+
+function openUnblockModal(username) {
+    unblockTargetUsername = username;
+    document.getElementById("unblock-username-display").innerText = username;
+    document.getElementById("unblock-admin-password").value = "";
+    document.getElementById("unblock-categorie").value = "";
+    document.getElementById("unblock-motif").value = "";
+    document.getElementById("unblock-modal").style.display = "flex";
+    document.getElementById("unblock-admin-password").focus();
+}
+
+function closeUnblockModal() {
+    document.getElementById("unblock-modal").style.display = "none";
+    unblockTargetUsername = null;
+}
+
+// Touche Échap : fermer la fenêtre de déblocage
+document.addEventListener("keydown", function(e) {
+    const modale = document.getElementById("unblock-modal");
+    if (e.key === "Escape" && modale && modale.style.display === "flex") closeUnblockModal();
+});
+
+function submitUnblock() {
+    // Anti-double-clic : un seul envoi tant que le serveur n'a pas répondu
+    MSPUI.withBusy(document.getElementById("btn-confirm-unblock"), envoyerDeblocage).catch(err => {
+        console.error("Erreur déblocage:", err);
+        toast("error", t("Erreur de chargement."), t("Réessayez dans un instant."));
+    });
+}
+
+async function envoyerDeblocage() {
+    const admin_password = document.getElementById("unblock-admin-password").value;
+    const categorie = document.getElementById("unblock-categorie").value;
+    const motif = document.getElementById("unblock-motif").value;
+
+    if (!admin_password) { toast("warning", t("Mot de passe administrateur requis.")); return; }
+    if (!categorie) { toast("warning", t("Veuillez choisir une catégorie.")); return; }
+    if (!motif.trim()) { toast("warning", t("Un motif détaillé est obligatoire.")); return; }
+
+    const res = await fetch("/security/unblock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: unblockTargetUsername, categorie, motif, admin_password })
+    });
+    const data = await res.json();
+    if (data.success) {
+        toast("success", data.message);
+        closeUnblockModal();
+        rafraichirComptesBloques();
+        loadLogs();
+    } else {
+        toast("error", t("Échec : ") + data.reason);
+    }
+}
+
+async function rafraichirComptesBloques() {
+    const res = await fetch("/security/status");
+    const data = await res.json();
+
+    document.getElementById("sec-bloques").innerText = data.comptes_bloques.length;
+    marquerAlerte("kpi-sec-bloques", data.comptes_bloques.length);
+    renderComptesBloques(data.comptes_bloques);
+}
+
+async function loadRgpdScore() {
+    try {
+        const response = await fetch("/conformite");
+        const data = await response.json();
+
+        document.getElementById("rgpd-score-global").innerText = data.score_global;
+        document.getElementById("score-chiffrement").innerText = data.chiffrement + "%";
+        document.getElementById("score-logs").innerText = data.logs + "%";
+        document.getElementById("score-rbac").innerText = data.rbac + "%";
+        document.getElementById("score-obligatoire").innerText = data.obligatoire + "%";
+        document.getElementById("rgpd-message").innerText = data.message;
+
+        const container = document.getElementById("score-badge-container");
+        if (data.statut === "success") {
+            container.className = "score-badge score-badge--success";
+        } else if (data.statut === "warning") {
+            container.className = "score-badge score-badge--warning";
+        } else {
+            container.className = "score-badge score-badge--danger";
+        }
+    } catch (error) {
+        console.error("Erreur score RGPD:", error);
+        ["score-chiffrement", "score-logs", "score-rbac", "score-obligatoire"].forEach(id => {
+            document.getElementById(id).innerText = "—";
+        });
+        document.getElementById("rgpd-message").innerText = t("Erreur de chargement.");
+    }
+}
+
+
+// Dernières statistiques reçues : permet de redessiner les graphiques
+// lors d'un changement de thème sans rappeler le serveur.
+let dernieresStats = null;
+
+// Formats d'affichage selon la langue
+function formatNombre(n) {
+    return Number(n || 0).toLocaleString(LANG === "en" ? "en-US" : "fr-FR");
+}
+
+function formatPourcent(valeur, total) {
+    const p = total > 0 ? Math.round((valeur * 100) / total) : 0;
+    return LANG === "en" ? p + "%" : p + " %";
+}
+
+// Bascule d'un panneau de graphique entre : prêt, vide, erreur
+function etatGraphique(prefixe, etat) {
+    const box = document.getElementById(prefixe + "-box");
+    const vide = document.getElementById(prefixe + "-empty");
+    const legende = document.getElementById(prefixe + "-legend");
+    box.classList.remove("is-loading");
+
+    if (etat === "pret") {
+        box.hidden = false;
+        vide.hidden = true;
+        return;
+    }
+    box.hidden = true;
+    legende.innerHTML = "";
+    vide.innerHTML = etat === "erreur"
+        ? etatErreur()
+        : etatVide("chart", t("Aucune donnée à afficher."), t("Les statistiques apparaîtront dès les premiers accès."));
+    vide.hidden = false;
+}
+
+// Infobulle aux couleurs du thème
+function styleInfobulle() {
+    return {
+        backgroundColor: cssVar("--color-surface"),
+        titleColor: cssVar("--color-text"),
+        bodyColor: cssVar("--color-text-secondary"),
+        borderColor: cssVar("--color-border-strong"),
+        borderWidth: 1,
+        cornerRadius: 8,
+        padding: 10,
+        boxPadding: 4,
+        usePointStyle: true,
+        titleFont: { weight: "600" }
+    };
+}
+
+function renderCharts(data, animer) {
+    // Toutes les couleurs viennent des variables CSS du thème courant
+    const couleurNiveau = {
+        high: cssVar("--chart-high"),
+        medium: cssVar("--chart-medium"),
+        low: cssVar("--chart-low")
+    };
+    const fondPanneau = cssVar("--chart-surface");
+
+    Chart.defaults.color = cssVar("--color-text-secondary");
+    Chart.defaults.borderColor = cssVar("--color-border");
+    Chart.defaults.font.family = cssVar("--font-sans");
+    Chart.defaults.font.size = 12;
+
+    const optionsCommunes = {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: animer === false ? false : { duration: 500 }
+    };
+
+    // ── Anneau : répartition par sensibilité (ordre fixe : élevée, moyenne, faible)
+    const sens = data.sensitivity || {};
+    const cles = [
+        ...ORDRE_SENSIBILITE.filter(k => k in sens),
+        ...Object.keys(sens).filter(k => !ORDRE_SENSIBILITE.includes(k))
+    ];
+    const valeurs = cles.map(k => Number(sens[k]) || 0);
+    const total = valeurs.reduce((a, b) => a + b, 0);
+
+    if (window.chartCamembert) { window.chartCamembert.destroy(); window.chartCamembert = null; }
+
+    if (total === 0) {
+        etatGraphique("chart-camembert", "vide");
+    } else {
+        etatGraphique("chart-camembert", "pret");
+        const libelles = cles.map(libelleSensibilite);
+        document.getElementById("chart-camembert-total").innerText = formatNombre(total);
+
+        window.chartCamembert = new Chart(document.getElementById("chart-camembert"), {
+            type: "doughnut",
+            data: {
+                labels: libelles,
+                datasets: [{
+                    data: valeurs,
+                    backgroundColor: cles.map(k => couleurNiveau[niveauSensibilite(k)]),
+                    borderColor: fondPanneau,
+                    borderWidth: 2,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                ...optionsCommunes,
+                cutout: "66%",
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        ...styleInfobulle(),
+                        callbacks: {
+                            label: ctx => ` ${ctx.label} : ${formatNombre(ctx.parsed)} (${formatPourcent(ctx.parsed, total)})`
+                        }
+                    }
+                }
+            }
+        });
+
+        // Légende HTML : libellé, effectif et part, en couleurs de texte
+        document.getElementById("chart-camembert-legend").innerHTML = cles.map((k, i) => `
+            <li><span class="swatch swatch--${niveauSensibilite(k)}"></span>${esc(libelles[i])}
+                <span class="chart-legend__value">${formatNombre(valeurs[i])}</span>
+                <span class="chart-legend__pct">${formatPourcent(valeurs[i], total)}</span></li>`).join("");
+
+        document.getElementById("chart-camembert").setAttribute("aria-label",
+            document.getElementById("chart-camembert-title").innerText + " : " +
+            cles.map((k, i) => `${libelles[i]} ${valeurs[i]}`).join(", "));
+    }
+
+    // ── Barres : accès accordés / refusés par rôle (ordre fixe des rôles)
+    const parRole = data.access_by_role || {};
+    const rolesBruts = Object.keys(parRole);
+    const roles = [
+        ...ORDRE_ROLES.filter(r => rolesBruts.includes(r)),
+        ...rolesBruts.filter(r => !ORDRE_ROLES.includes(r))
+    ];
+    const accordes = roles.map(r => parRole[r]["accordé"] || 0);
+    const refuses = roles.map(r => parRole[r]["refusé"] || 0);
+    const totalAccordes = accordes.reduce((a, b) => a + b, 0);
+    const totalRefuses = refuses.reduce((a, b) => a + b, 0);
+
+    if (window.chartBarres) { window.chartBarres.destroy(); window.chartBarres = null; }
+
+    if (totalAccordes + totalRefuses === 0) {
+        etatGraphique("chart-barres", "vide");
+    } else {
+        etatGraphique("chart-barres", "pret");
+        const styleBarre = { borderRadius: 4, borderSkipped: "start", maxBarThickness: 28, categoryPercentage: 0.7, barPercentage: 0.86 };
+
+        window.chartBarres = new Chart(document.getElementById("chart-barres"), {
+            type: "bar",
+            data: {
+                labels: roles.map(libelleRole),
+                datasets: [
+                    { label: t("Accordés"), data: accordes, backgroundColor: couleurNiveau.low, ...styleBarre },
+                    { label: t("Refusés"), data: refuses, backgroundColor: couleurNiveau.high, ...styleBarre }
+                ]
+            },
+            options: {
+                ...optionsCommunes,
+                interaction: { mode: "index", intersect: false },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        border: { display: false },
+                        ticks: { color: cssVar("--color-text-secondary") }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: cssVar("--color-border") },
+                        border: { display: false },
+                        ticks: { color: cssVar("--color-text-muted"), precision: 0 }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        ...styleInfobulle(),
+                        callbacks: { label: ctx => ` ${ctx.dataset.label} : ${formatNombre(ctx.parsed.y)}` }
+                    }
+                }
+            }
+        });
+
+        document.getElementById("chart-barres-legend").innerHTML = `
+            <li><span class="swatch swatch--low"></span>${t("Accordés")} <span class="chart-legend__value">${formatNombre(totalAccordes)}</span></li>
+            <li><span class="swatch swatch--high"></span>${t("Refusés")} <span class="chart-legend__value">${formatNombre(totalRefuses)}</span></li>`;
+
+        document.getElementById("chart-barres").setAttribute("aria-label",
+            document.getElementById("chart-barres-title").innerText + " : " +
+            roles.map((r, i) => `${libelleRole(r)} ${accordes[i]} ${t("Accordés").toLowerCase()}, ${refuses[i]} ${t("Refusés").toLowerCase()}`).join(" ; "));
+    }
+}
+
+// Changement de thème : on redessine avec les nouvelles couleurs, sans animation
+document.addEventListener("msp:themechange", function() {
+    if (dernieresStats && window.Chart) renderCharts(dernieresStats, false);
+});
+
+async function loadDashboard() {
+    try {
+        const res = await fetch("/stats");
+        const data = await res.json();
+        const c = data.counters;
+
+        document.getElementById("count-dossiers").innerText = formatNombre(c.total_dossiers);
+        document.getElementById("count-chiffres").innerText = formatNombre(c.total_chiffres);
+        document.getElementById("count-acces").innerText = formatNombre(c.acces_aujourd_hui);
+        document.getElementById("count-alertes").innerText = formatNombre(c.total_alertes);
+
+        document.getElementById("count-chiffres-sub").innerText = c.total_dossiers > 0
+            ? formatPourcent(c.total_chiffres, c.total_dossiers) + " " + t("du total")
+            : "";
+        marquerAlerte("kpi-alertes", c.total_alertes);
+
+        dernieresStats = data;
+        try {
+            renderCharts(data);
+        } catch (errGraphique) {
+            // Ex. : bibliothèque Chart.js indisponible (CDN injoignable)
+            console.error("Erreur graphiques:", errGraphique);
+            etatGraphique("chart-camembert", "erreur");
+            etatGraphique("chart-barres", "erreur");
+        }
+
+    } catch (err) {
+        console.error("Erreur dashboard:", err);
+        ["count-dossiers", "count-chiffres", "count-acces", "count-alertes"].forEach(id => {
+            document.getElementById(id).innerText = "—";
+        });
+        etatGraphique("chart-camembert", "erreur");
+        etatGraphique("chart-barres", "erreur");
+    }
+}
+
+// ── Historique médical et ajout d'entrée (médecin) ───────────────────────────
+async function chargerHistorique() {
+    const patientId = document.getElementById("patient-hist").value;
+    const section = document.getElementById("historique-section");
+    const content = document.getElementById("historique-content");
+
+    if (!patientId) {
+        section.style.display = "none";
+        return;
+    }
+
+    section.style.display = "block";
+    content.innerHTML = etatChargement(t("Chargement..."));
+
+    try {
+        const res = await fetch(`/api/historique/${encodeURIComponent(patientId)}`);
+        const data = await res.json();
+
+        if (!data.success) {
+            afficher(content, etatVide("alert", data.reason, "", "error"));
+            return;
+        }
+
+        if (data.entrees.length === 0) {
+            afficher(content, etatVide("file", t("Aucune entrée pour ce patient. Ajoutez la première ci-dessous.")));
+            return;
+        }
+
+        let html = "";
+        data.entrees.forEach(e => {
+            const niveau = niveauSensibilite(e.sensitivity_level);
+            html += `
+                <div class="entry entry--${niveau}">
+                    <div class="entry__head">
+                        <span class="entry__meta">
+                            <span class="meta-item">${ic("file")} ${esc(t(e.type))}</span>
+                            <span class="meta-item">${ic("clock")} ${esc(e.date)}</span>
+                            <span class="meta-item">${ic("pen")} ${esc(t(e.medecin_auteur))}</span>
+                        </span>
+                        <span class="badge badge--${niveau}">${esc(libelleSensibilite(e.sensitivity_level))}</span>
+                    </div>
+                    <div class="entry__body">
+                        <b>${t("Diagnostic")} :</b> ${esc(e.diagnostic) || "—"}<br>
+                        <b>${t("Médicaments")} :</b> ${esc(e.medicaments) || "—"}<br>
+                        <b>${t("Notes")} :</b> ${esc(e.notes) || "—"}
+                    </div>
+                </div>
+            `;
+        });
+        afficher(content, html);
+    } catch (err) {
+        afficher(content, etatErreur());
+    }
+}
+
+const entreeForm = document.getElementById("entree-form");
+if (entreeForm) {
+    entreeForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+        // Anti-double-clic : évite d'ajouter deux fois la même entrée au dossier
+        const bouton = entreeForm.querySelector('button[type="submit"]');
+        MSPUI.withBusy(bouton, ajouterEntree).catch(err => {
+            console.error("Erreur ajout d'entrée:", err);
+            toast("error", t("Erreur de chargement."), t("Réessayez dans un instant."));
+        });
+    });
+
+    async function ajouterEntree() {
+        const patientId = document.getElementById("patient-hist").value;
+        if (!patientId) { toast("warning", t("Veuillez d'abord sélectionner un patient.")); return; }
+
+        const payload = {
+            patient_id: patientId,
+            diagnostic: document.getElementById("e-diagnostic").value,
+            medicaments: document.getElementById("e-medicaments").value,
+            notes: document.getElementById("e-notes").value
+        };
+
+        const res = await fetch("/api/ajouter-entree", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            const chiffreTexte = data.chiffre
+                ? `${t("Données sensibles chiffrées automatiquement (sensibilité :")} ${libelleSensibilite(data.sensitivity)})`
+                : t("Aucune donnée sensible détectée");
+            toast("success", data.message, `${t("Entrée")} #${data.entree_id} · ${chiffreTexte}`);
+            entreeForm.reset();
+            chargerHistorique();
+        } else {
+            toast("error", data.reason);
+        }
+    }
+}
+
+// ── Vue patient : mon dossier (lecture seule, présentation épurée) ───────────
+async function chargerMonDossier() {
+    const content = document.getElementById("mon-dossier-content");
+    if (!content) return;
+
+    try {
+        const res = await fetch("/api/mon-dossier");
+        const data = await res.json();
+
+        if (!data.success) {
+            afficher(content, etatVide("alert", data.reason, "", "error"));
+            return;
+        }
+
+        if (data.entrees.length === 0) {
+            afficher(content, etatVide("file", t("Votre dossier est vide pour le moment.")));
+            return;
+        }
+
+        let html = "";
+        data.entrees.forEach(e => {
+            const estInitial = e.type === "Dossier initial";
+            const badgeType = estInitial
+                ? `<span class="badge badge--info">${t("Dossier initial")}</span>`
+                : `<span class="badge badge--primary">${t("Consultation")}</span>`;
+
+            // Date lisible (sans les microsecondes)
+            const dateLisible = (e.date || "").split(".")[0];
+
+            html += `
+                <article class="record">
+                    <div class="record__head">
+                        ${badgeType}
+                        <span class="record__date meta-item">${ic("clock")} ${esc(dateLisible)}</span>
+                    </div>
+                    <div class="record__fields">
+                        <div class="record__row"><span class="record__key">${t("Diagnostic")}</span><span>${esc(e.diagnostic) || "—"}</span></div>
+                        <div class="record__row"><span class="record__key">${t("Médicaments")}</span><span>${esc(e.medicaments) || "—"}</span></div>
+                        <div class="record__row"><span class="record__key">${t("Notes")}</span><span>${esc(e.notes) || "—"}</span></div>
+                    </div>
+                    <div class="record__foot">
+                        ${estInitial ? t("Dossier d'origine") : t("Rédigé par votre médecin")}
+                    </div>
+                </article>
+            `;
+        });
+        afficher(content, html);
+    } catch (err) {
+        afficher(content, etatErreur());
+    }
+}
+
+window.onload = function() {
+    const role = document.body.getAttribute("data-role");
+    if (role === "admin") {
+        loadDashboard();
+        loadLogs();
+        loadSecurity();
+        loadRgpdScore();
+    }
+    if (role === "medecin") {
+        // Le médecin sélectionne un patient pour voir son historique
+    }
+    if (role === "patient") {
+        chargerMonDossier();
+    }
+};
+
+</script>
+<div id="unblock-modal" class="modal-backdrop" style="display:none;">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="unblock-modal-title">
+        <h3 class="modal__title" id="unblock-modal-title">{{ _("Débloquer le compte") }} <span id="unblock-username-display" class="modal__target"></span></h3>
+
+        <div class="form-group">
+            <label for="unblock-admin-password">{{ _("Mot de passe administrateur") }}</label>
+            <input type="password" id="unblock-admin-password">
+        </div>
+
+        <div class="form-group">
+            <label for="unblock-categorie">{{ _("Catégorie du motif") }}</label>
+            <select id="unblock-categorie">
+                <option value="">{{ _("-- Sélectionnez --") }}</option>
+                <option value="Identité vérifiée">{{ _("Identité vérifiée") }}</option>
+                <option value="Incident de sécurité traité">{{ _("Incident de sécurité traité") }}</option>
+                <option value="Test de sécurité">{{ _("Test de sécurité") }}</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="unblock-motif">{{ _("Détail du motif") }}</label>
+            <textarea id="unblock-motif" rows="3"></textarea>
+        </div>
+
+        <div class="btn-group">
+            <button type="button" class="btn-secondary" onclick="closeUnblockModal()">{{ _("Annuler") }}</button>
+            <button type="button" class="btn-primary" id="btn-confirm-unblock" onclick="submitUnblock()">{{ _("Confirmer le déblocage") }}</button>
+        </div>
+    </div>
+</div>
+</body>
+</html>

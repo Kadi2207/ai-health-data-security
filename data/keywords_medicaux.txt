@@ -1,0 +1,70 @@
+# Mots-clés médicaux sensibles — Projet TCIM
+# Contexte : données de santé françaises — RGPD + HDS
+# Ces mots-clés servent au classifieur IA pour détecter les données sensibles
+
+# Identifiants personnels
+NIR
+numéro de sécurité sociale
+date de naissance
+adresse
+nom
+prénom
+
+# Diagnostics médicaux
+diagnostic
+pathologie
+maladie
+syndrome
+cancer
+diabète
+hypertension
+insuffisance
+infection
+VIH
+SIDA
+tuberculose
+dépression
+schizophrénie
+épilepsie
+alzheimer
+parkinson
+
+# Médicaments
+médicament
+ordonnance
+posologie
+traitement
+prescription
+antibiotique
+antidépresseur
+chimiothérapie
+insuline
+morphine
+anticoagulant
+corticoïde
+vaccin
+
+# Médecine traditionnelle et complémentaire (TCIM)
+phytothérapie
+acupuncture
+homéopathie
+ostéopathie
+naturopathie
+ayurveda
+médecine traditionnelle
+
+# Praticiens
+médecin traitant
+spécialiste
+chirurgien
+psychiatre
+infirmier
+pharmacien
+
+# Données administratives sensibles
+numéro de dossier
+mutuelle
+assurance maladie
+groupe sanguin
+antécédents
+allergie

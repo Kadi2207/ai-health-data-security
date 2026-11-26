@@ -1,0 +1,607 @@
+# English translations for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-11-26 23:00+0100\n"
+"PO-Revision-Date: 2026-08-10 05:54+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: src/app.py:129
+msgid "Session invalide."
+msgstr "Invalid session."
+
+#: src/app.py:140
+msgid "Le mot de passe ne respecte pas la politique de sécurité."
+msgstr "The password does not meet the security policy."
+
+#: src/app.py:153 src/app.py:302 src/app.py:676
+msgid "Utilisateur introuvable"
+msgstr "User not found"
+
+#: src/app.py:154
+msgid "Mot de passe incorrect"
+msgstr "Incorrect password"
+
+#: src/app.py:170 src/app.py:298
+msgid "Compte bloqué pour raison de sécurité. Contactez l'administrateur."
+msgstr "Account locked for security reasons. Please contact the administrator."
+
+#: src/app.py:259
+msgid ""
+"La double authentification est requise pour faire confiance à cet "
+"appareil."
+msgstr "Two-factor authentication is required to trust this device."
+
+#: src/app.py:292
+msgid "Session de connexion invalide. Veuillez ressaisir votre mot de passe."
+msgstr "Invalid sign-in session. Please enter your password again."
+
+#: src/app.py:318
+msgid "Code 2FA incorrect"
+msgstr "Incorrect 2FA code"
+
+#: src/app.py:326
+msgid "Utilisateur sans secret 2FA"
+msgstr "User has no 2FA secret"
+
+#: src/app.py:354
+msgid "patient_id requis"
+msgstr "patient_id required"
+
+#: src/app.py:377
+msgid "Seul un médecin peut créer un dossier."
+msgstr "Only a doctor can create a record."
+
+#: src/app.py:392
+msgid "Le diagnostic est obligatoire."
+msgstr "The diagnosis is required."
+
+#: src/app.py:407
+msgid ""
+"Nom, prénom et date de naissance sont obligatoires pour un nouveau "
+"patient."
+msgstr "Last name, first name and date of birth are required for a new patient."
+
+#: src/app.py:440
+msgid "Dossier créé, classé et sécurisé avec succès."
+msgstr "Record successfully created, classified and secured."
+
+#: src/app.py:449 src/app.py:593
+msgid "Réservé au médecin."
+msgstr "Restricted to doctors."
+
+#: src/app.py:467
+msgid "Seul un médecin peut ajouter une entrée."
+msgstr "Only a doctor can add an entry."
+
+#: src/app.py:481
+msgid "Patient non spécifié."
+msgstr "No patient specified."
+
+#: src/app.py:483
+msgid "L'entrée ne peut pas être vide."
+msgstr "The entry cannot be empty."
+
+#: src/app.py:513
+msgid "Entrée ajoutée à l'historique du patient."
+msgstr "Entry added to the patient's history."
+
+#: src/app.py:524
+msgid "Réservé au patient."
+msgstr "Restricted to the patient."
+
+#: src/app.py:533
+msgid "Aucun dossier associé à votre compte."
+msgstr "No record associated with your account."
+
+#: src/app.py:744
+msgid "Action réservée à l'administrateur"
+msgstr "Action restricted to the administrator"
+
+#: src/app.py:761
+msgid "Mot de passe administrateur incorrect."
+msgstr "Incorrect administrator password."
+
+#: src/app.py:765
+msgid "Catégorie de motif invalide ou manquante."
+msgstr "Invalid or missing reason category."
+
+#: src/app.py:769
+msgid "Le motif doit contenir au moins 10 caractères."
+msgstr "The reason must be at least 10 characters long."
+
+#: src/app.py:771
+msgid "Le motif n'est pas suffisamment explicite."
+msgstr "The reason is not sufficiently explicit."
+
+#: src/app.py:773
+msgid "Le motif doit être une justification (au moins 3 mots)."
+msgstr "The reason must be a justification (at least 3 words)."
+
+#: src/app.py:803
+#, python-format
+msgid "Compte %(user)s débloqué"
+msgstr "Account %(user)s unblocked"
+
+#: src/app.py:851
+msgid "Conforme — Système hautement sécurisé"
+msgstr "Compliant — Highly secure system"
+
+#: src/app.py:853
+msgid "Avertissement — Des vulnérabilités sont présentes"
+msgstr "Warning — Vulnerabilities are present"
+
+#: src/app.py:855
+msgid "Non conforme — Action corrective requise"
+msgstr "Non-compliant — Corrective action required"
+
+#: templates/_header.html:18 templates/index.html:6
+msgid "TCIM — Sécurisation des Données de Santé"
+msgstr "TCIM — Health Data Security"
+
+#: templates/_header.html:19
+msgid "Sécurisation des données de santé par l'IA"
+msgstr "AI-powered health data security"
+
+#: templates/_header.html:25
+msgid "Langue"
+msgstr "Language"
+
+#: templates/_header.html:32 templates/_header.html:33
+msgid "Basculer entre thème clair et sombre"
+msgstr "Toggle light and dark theme"
+
+#: templates/_header.html:44
+msgid "Se déconnecter"
+msgstr "Log out"
+
+#: templates/change_password.html:6
+msgid "Changer votre mot de passe — TCIM"
+msgstr "Change your password — TCIM"
+
+#: templates/change_password.html:25
+msgid "Définissez votre mot de passe"
+msgstr "Set your password"
+
+#: templates/change_password.html:26
+msgid "Première connexion — choisissez un mot de passe personnel et sécurisé"
+msgstr "First login — choose a personal, secure password"
+
+#: templates/change_password.html:29
+msgid "Nouveau mot de passe"
+msgstr "New password"
+
+#: templates/change_password.html:34
+msgid "Confirmez le mot de passe"
+msgstr "Confirm password"
+
+#: templates/change_password.html:39
+msgid "Au moins 12 caractères"
+msgstr "At least 12 characters"
+
+#: templates/change_password.html:40
+msgid "Une lettre majuscule"
+msgstr "One uppercase letter"
+
+#: templates/change_password.html:41
+msgid "Une lettre minuscule"
+msgstr "One lowercase letter"
+
+#: templates/change_password.html:42
+msgid "Un chiffre"
+msgstr "One digit"
+
+#: templates/change_password.html:43
+#, python-format
+msgid "Un caractère spécial (@ # $ %% ...)"
+msgstr "One special character (@ # $ %% ...)"
+
+#: templates/change_password.html:44
+msgid "Les deux mots de passe correspondent"
+msgstr "Both passwords match"
+
+#: templates/change_password.html:47
+msgid "Valider mon mot de passe"
+msgstr "Confirm my password"
+
+#: templates/change_password.html:53
+msgid "Erreur lors du changement."
+msgstr "Error while changing the password."
+
+#: templates/index.html:46
+msgid "Administrateur"
+msgstr "Administrator"
+
+#: templates/index.html:47
+msgid "Médecin"
+msgstr "Doctor"
+
+#: templates/index.html:48
+msgid "Infirmier"
+msgstr "Nurse"
+
+#: templates/index.html:49
+msgid "Patient"
+msgstr "Patient"
+
+#: templates/index.html:59
+msgid "Dashboard — Statistiques en Temps Réel"
+msgstr "Dashboard — Real-Time Statistics"
+
+#: templates/index.html:62 templates/index.html:89
+msgid "Total dossiers"
+msgstr "Total records"
+
+#: templates/index.html:67
+msgid "Dossiers chiffrés"
+msgstr "Encrypted records"
+
+#: templates/index.html:72
+msgid "Accès aujourd'hui"
+msgstr "Accesses today"
+
+#: templates/index.html:77
+msgid "Alertes actives"
+msgstr "Active alerts"
+
+#: templates/index.html:84
+msgid "Répartition par sensibilité"
+msgstr "Distribution by sensitivity"
+
+#: templates/index.html:96
+msgid "Accès accordés vs refusés par rôle"
+msgstr "Granted vs denied access by role"
+
+#: templates/index.html:110
+msgid "Dossier patient — Historique médical"
+msgstr "Patient record — Medical history"
+
+#: templates/index.html:116
+msgid ""
+"Consultez l'historique d'un patient et ajoutez une nouvelle entrée. Les "
+"entrées passées ne sont jamais modifiées."
+msgstr ""
+"Review a patient's history and add a new entry. Past entries are never "
+"modified."
+
+#: templates/index.html:119
+msgid "Sélectionner un patient"
+msgstr "Select a patient"
+
+#: templates/index.html:121
+msgid "-- Choisir un patient --"
+msgstr "-- Choose a patient --"
+
+#: templates/index.html:129
+msgid "Historique des entrées"
+msgstr "Entry history"
+
+#: templates/index.html:135
+msgid "Ajouter une nouvelle entrée"
+msgstr "Add a new entry"
+
+#: templates/index.html:138
+msgid "Diagnostic"
+msgstr "Diagnosis"
+
+#: templates/index.html:139
+msgid "Diagnostic de cette consultation"
+msgstr "Diagnosis for this consultation"
+
+#: templates/index.html:142
+msgid "Médicaments"
+msgstr "Medications"
+
+#: templates/index.html:143
+msgid "Traitements prescrits"
+msgstr "Prescribed treatments"
+
+#: templates/index.html:146
+msgid "Notes"
+msgstr "Notes"
+
+#: templates/index.html:147
+msgid "Observations complémentaires"
+msgstr "Additional observations"
+
+#: templates/index.html:149
+msgid "Ajouter au dossier"
+msgstr "Add to record"
+
+#: templates/index.html:157
+msgid "Mon dossier médical"
+msgstr "My medical record"
+
+#: templates/index.html:163
+msgid ""
+"Vous consultez votre dossier médical en lecture seule. Vos données sont "
+"chiffrées et sécurisées."
+msgstr ""
+"You are viewing your medical record in read-only mode. Your data is "
+"encrypted and secure."
+
+#: templates/index.html:166
+msgid "Chargement de votre dossier..."
+msgstr "Loading your record..."
+
+#: templates/index.html:173
+msgid "Tester le Pipeline"
+msgstr "Test the Pipeline"
+
+#: templates/index.html:176
+msgid "Patient ID"
+msgstr "Patient ID"
+
+#: templates/index.html:184
+msgid "Utilisateur connecté"
+msgstr "Logged-in user"
+
+#: templates/index.html:193
+msgid "Permission demandée"
+msgstr "Requested permission"
+
+#: templates/index.html:202
+msgid "Lancer le pipeline"
+msgstr "Run the pipeline"
+
+#: templates/index.html:208
+msgid "Résultat"
+msgstr "Result"
+
+#: templates/index.html:214
+msgid "Tableau de Bord Conformité RGPD"
+msgstr "GDPR Compliance Dashboard"
+
+#: templates/index.html:217
+msgid "Score :"
+msgstr "Score:"
+
+#: templates/index.html:220
+msgid "Chargement du score en temps réel..."
+msgstr "Loading score in real time..."
+
+#: templates/index.html:221
+#, python-format
+msgid ""
+"Pondération réglementaire : Chiffrement (30%%), Logs (30%%), RBAC (20%%),"
+" Données obligatoires (20%%)"
+msgstr ""
+"Regulatory weighting: Encryption (30%%), Logs (30%%), RBAC (20%%), "
+"Mandatory data (20%%)"
+
+#: templates/index.html:224
+msgid "Télécharger le Rapport PDF"
+msgstr "Download PDF Report"
+
+#: templates/index.html:229
+msgid "Chiffrement (Fernet)"
+msgstr "Encryption (Fernet)"
+
+#: templates/index.html:233
+msgid "Traçabilité & Logs d'Audit"
+msgstr "Traceability & Audit Logs"
+
+#: templates/index.html:237
+msgid "Respect Politique RBAC"
+msgstr "RBAC Policy Compliance"
+
+#: templates/index.html:241
+msgid "Mentions Obligatoires"
+msgstr "Mandatory Information"
+
+#: templates/index.html:250
+msgid "Centre de Sécurité — Détection d'Intrusion"
+msgstr "Security Center — Intrusion Detection"
+
+#: templates/index.html:253
+msgid "Alertes de sécurité actives"
+msgstr "Active security alerts"
+
+#: templates/index.html:257 templates/index.html:268
+msgid "Comptes bloqués"
+msgstr "Blocked accounts"
+
+#: templates/index.html:262
+msgid "Lancer un scan de sécurité"
+msgstr "Run a security scan"
+
+#: templates/index.html:264
+msgid "Menaces détectées"
+msgstr "Detected threats"
+
+#: templates/index.html:277
+msgid "Logs d'audit"
+msgstr "Audit logs"
+
+#: templates/index.html:279
+msgid "Actualiser les logs"
+msgstr "Refresh logs"
+
+#: templates/index.html:1259
+msgid "Débloquer le compte"
+msgstr "Unblock account"
+
+#: templates/index.html:1262
+msgid "Mot de passe administrateur"
+msgstr "Administrator password"
+
+#: templates/index.html:1267
+msgid "Catégorie du motif"
+msgstr "Reason category"
+
+#: templates/index.html:1269
+msgid "-- Sélectionnez --"
+msgstr "-- Select --"
+
+#: templates/index.html:1270
+msgid "Identité vérifiée"
+msgstr "Identity verified"
+
+#: templates/index.html:1271
+msgid "Incident de sécurité traité"
+msgstr "Security incident handled"
+
+#: templates/index.html:1272
+msgid "Test de sécurité"
+msgstr "Security test"
+
+#: templates/index.html:1277
+msgid "Détail du motif"
+msgstr "Reason details"
+
+#: templates/index.html:1282
+msgid "Annuler"
+msgstr "Cancel"
+
+#: templates/index.html:1283
+msgid "Confirmer le déblocage"
+msgstr "Confirm unblocking"
+
+#: templates/login.html:6
+msgid "Connexion — TCIM"
+msgstr "Sign in — TCIM"
+
+#: templates/login.html:26
+msgid "Sécurisation des Données de Santé — Accès sécurisé"
+msgstr "Health Data Security — Secure access"
+
+#: templates/login.html:31
+msgid "Identifiant professionnel"
+msgstr "Professional username"
+
+#: templates/login.html:32 templates/setup_2fa.html:31
+msgid "Saisissez votre identifiant"
+msgstr "Enter your username"
+
+#: templates/login.html:35
+msgid "Mot de passe"
+msgstr "Password"
+
+#: templates/login.html:38
+msgid "Continuer →"
+msgstr "Continue →"
+
+#: templates/login.html:44
+msgid ""
+"Entrez le code à 6 chiffres affiché dans votre application "
+"d'authentification"
+msgstr "Enter the 6-digit code shown in your authenticator app"
+
+#: templates/login.html:47
+msgid "Code de double authentification"
+msgstr "Two-factor authentication code"
+
+#: templates/login.html:54
+msgid "Faire confiance à cet appareil pendant 30 jours"
+msgstr "Trust this device for 30 days"
+
+#: templates/login.html:55
+msgid ""
+"Le mot de passe restera demandé à chaque connexion. Ne cochez pas sur un "
+"poste partagé."
+msgstr ""
+"Your password will still be required at every sign-in. Do not check this "
+"on a shared computer."
+
+#: templates/login.html:58
+msgid "Se connecter"
+msgstr "Sign in"
+
+#: templates/login.html:59
+msgid "← Retour"
+msgstr "← Back"
+
+#: templates/login.html:64
+msgid "Première connexion ?"
+msgstr "First login?"
+
+#: templates/login.html:64
+msgid "Configurer la double authentification"
+msgstr "Set up two-factor authentication"
+
+#: templates/login.html:71
+msgid "Échec de la connexion."
+msgstr "Sign-in failed."
+
+#: templates/login.html:72
+msgid "Code incorrect."
+msgstr "Incorrect code."
+
+#: templates/login.html:73
+msgid "Veuillez saisir un mot de passe."
+msgstr "Please enter a password."
+
+#: templates/login.html:74
+msgid "Le code doit contenir 6 chiffres."
+msgstr "The code must contain 6 digits."
+
+#: templates/login.html:75
+msgid ""
+"Connexion réussie, mais cet appareil n'a pas pu être enregistré comme "
+"appareil de confiance."
+msgstr "Signed in, but this device could not be registered as a trusted device."
+
+#: templates/setup_2fa.html:6
+msgid "Configuration 2FA — TCIM"
+msgstr "2FA setup — TCIM"
+
+#: templates/setup_2fa.html:26
+msgid "Configuration de la double authentification"
+msgstr "Two-factor authentication setup"
+
+#: templates/setup_2fa.html:27
+msgid "Sécurisez votre compte avec votre application d'authentification"
+msgstr "Secure your account with your authenticator app"
+
+#: templates/setup_2fa.html:30
+msgid "Compte à configurer"
+msgstr "Account to set up"
+
+#: templates/setup_2fa.html:32
+msgid "Afficher mon QR code →"
+msgstr "Show my QR code →"
+
+#: templates/setup_2fa.html:36
+msgid "Ouvrez Microsoft Authenticator ou Google Authenticator sur votre téléphone"
+msgstr "Open Microsoft Authenticator or Google Authenticator on your phone"
+
+#: templates/setup_2fa.html:37
+msgid "Scannez le QR code ci-dessous"
+msgstr "Scan the QR code below"
+
+#: templates/setup_2fa.html:38
+msgid "Un code à 6 chiffres sera généré, renouvelé toutes les 30 secondes"
+msgstr "A 6-digit code will be generated and renewed every 30 seconds"
+
+#: templates/setup_2fa.html:43
+msgid "QR code de double authentification"
+msgstr "Two-factor authentication QR code"
+
+#: templates/setup_2fa.html:45
+msgid "Ou saisissez ce code manuellement dans votre application :"
+msgstr "Or enter this code manually in your app:"
+
+#: templates/setup_2fa.html:49
+msgid "Aller à la connexion →"
+msgstr "Go to sign in →"
+
+#: templates/setup_2fa.html:56
+msgid "Identifiant introuvable."
+msgstr "Username not found."
+
+#: templates/setup_2fa.html:57
+msgid "Veuillez saisir votre identifiant."
+msgstr "Please enter your username."
+

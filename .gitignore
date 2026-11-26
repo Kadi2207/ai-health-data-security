@@ -1,0 +1,31 @@
+# Environnement virtuel
+venv/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Base de données locale
+*.db
+*.sqlite3
+
+# Clés secrètes — JAMAIS sur GitHub
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Liste des accès générée par src/init_auth.py (mots de passe en clair)
+comptes_acces.txt
+
+# Journaux
+*.log
+
+# Éditeurs
+.vscode/
+.idea/
+
+# Système
+.DS_Store
+Thumbs.db

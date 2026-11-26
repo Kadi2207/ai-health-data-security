@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="{{ current_lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ _("Configuration 2FA — TCIM") }}</title>
+    <script src="/static/theme.js"></script>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/ui.js"></script>
+</head>
+<body class="auth-page">
+
+{% set auth_page = true %}
+{% set show_lang = true %}
+{% include "_header.html" %}
+
+<main class="auth-main">
+    <div class="auth-card">
+        <div class="auth-card__icon">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="5" y="2" width="14" height="20" rx="2"/>
+                <path d="M12 18h.01"/>
+                <path d="M9 9l2 2 4-4"/>
+            </svg>
+        </div>
+        <h1>{{ _("Configuration de la double authentification") }}</h1>
+        <p class="subtitle">{{ _("Sécurisez votre compte avec votre application d'authentification") }}</p>
+
+        <form class="form-group" id="form-qr" novalidate>
+            <label for="username">{{ _("Compte à configurer") }}</label>
+            <input type="text" id="username" class="form-control" placeholder="{{ _('Saisissez votre identifiant') }}" autocomplete="username">
+            <button type="submit" class="btn-primary btn-block mt-3" id="btn-qr">{{ _("Afficher mon QR code →") }}</button>
+        </form>
+
+        <div class="instructions">
+            <div class="step"><span class="step-num">1</span> {{ _("Ouvrez Microsoft Authenticator ou Google Authenticator sur votre téléphone") }}</div>
+            <div class="step"><span class="step-num">2</span> {{ _("Scannez le QR code ci-dessous") }}</div>
+            <div class="step"><span class="step-num">3</span> {{ _("Un code à 6 chiffres sera généré, renouvelé toutes les 30 secondes") }}</div>
+        </div>
+
+        <div id="qr-section" style="display:none;">
+            <div class="qr-wrap">
+                <img id="qr-image" src="" alt="{{ _('QR code de double authentification') }}">
+            </div>
+            <div class="secret-label">{{ _("Ou saisissez ce code manuellement dans votre application :") }}</div>
+            <div class="secret-code" id="secret-code">...</div>
+        </div>
+
+        <a href="/login" class="btn-secondary btn-block">{{ _("Aller à la connexion →") }}</a>
+    </div>
+</main>
+
+<script>
+// Messages traduits côté serveur (Flask-Babel), sérialisés en JSON sûr
+const MSG = {{ {
+    "introuvable": _("Identifiant introuvable."),
+    "identifiantRequis": _("Veuillez saisir votre identifiant.")
+} | tojson }};
+
+function showError(msg) {
+    MSPToast.show({ type: "error", title: msg });
+}
+
+// Anti-double-clic sur l'affichage du QR code
+document.getElementById("form-qr").addEventListener("submit", function (e) {
+    e.preventDefault();
+    MSPUI.withBusy(document.getElementById("btn-qr"), loadQR)
+        .catch(() => showError(MSG.introuvable));
+});
+
+async function loadQR() {
+    const username = document.getElementById("username").value.trim();
+    if (!username) { MSPToast.show({ type: "warning", title: MSG.identifiantRequis }); return; }
+    // L'identifiant est encodé : il ne peut pas modifier le chemin de l'URL appelée
+    const res = await fetch(`/api/qr-code/${encodeURIComponent(username)}`);
+    if (!res.ok) { showError(MSG.introuvable); return; }
+    const data = await res.json();
+    if (data.error) { showError(data.error); return; }
+    document.getElementById("qr-image").src = data.qr_code;
+    document.getElementById("secret-code").innerText = data.secret;
+    document.getElementById("qr-section").style.display = "block";
+}
+</script>
+
+</body>
+</html>

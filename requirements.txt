@@ -1,0 +1,27 @@
+# Application web
+flask==3.0.3
+flask-babel==4.0.0
+Flask-Limiter==4.1.1
+itsdangerous==2.2.0
+
+# Base de données PostgreSQL
+psycopg2-binary==2.9.12
+
+# Sécurité : chiffrement, mots de passe, 2FA TOTP
+cryptography==42.0.8
+bcrypt==5.0.0
+pyotp==2.9.0
+qrcode==8.2
+pillow==12.2.0
+
+# Classification IA
+scikit-learn==1.5.2
+pandas==2.2.3
+
+# Configuration, données fictives, rapport PDF
+python-dotenv==1.0.1
+faker==28.4.1
+reportlab==5.1.2
+
+# Script de démonstration d'attaque (attaque.py)
+requests==2.34.2

@@ -1,0 +1,52 @@
+{#
+  En-tête d'application commun à toutes les pages.
+  Variables optionnelles (définies avec {% set %} avant l'include) :
+    show_lang   : affiche le sélecteur de langue FR / EN
+    show_logout : affiche le lien de déconnexion (pages authentifiées)
+    auth_page   : page d'authentification (le titre de la marque n'est alors
+                  pas un <h1>, la carte centrale portant déjà le titre)
+#}
+{% set brand_tag = 'div' if auth_page else 'h1' %}
+<header class="app-header">
+    <div class="app-header__inner">
+        <div class="brand">
+            <svg class="icon brand__mark" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                <path d="M12 8v6M9 11h6"/>
+            </svg>
+            <div class="brand__text">
+                <{{ brand_tag }} class="brand__title">{{ _("TCIM — Sécurisation des Données de Santé") }}</{{ brand_tag }}>
+                <span class="brand__subtitle">{{ _("Sécurisation des données de santé par l'IA") }}</span>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            {% if show_lang %}
+            <nav class="lang-switch" aria-label="{{ _('Langue') }}">
+                <a href="/set-lang/fr" class="lang-switch__item{% if current_lang == 'fr' %} is-active{% endif %}" lang="fr"{% if current_lang == 'fr' %} aria-current="true"{% endif %}>FR</a>
+                <a href="/set-lang/en" class="lang-switch__item{% if current_lang == 'en' %} is-active{% endif %}" lang="en"{% if current_lang == 'en' %} aria-current="true"{% endif %}>EN</a>
+            </nav>
+            {% endif %}
+
+            <button type="button" class="icon-btn theme-toggle" data-theme-toggle aria-pressed="false"
+                    aria-label="{{ _('Basculer entre thème clair et sombre') }}"
+                    title="{{ _('Basculer entre thème clair et sombre') }}">
+                <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+                <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="12" r="4"/>
+                    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+                </svg>
+            </button>
+
+            {% if show_logout %}
+            <a href="/logout" class="icon-btn" aria-label="{{ _('Se déconnecter') }}" title="{{ _('Se déconnecter') }}">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+                </svg>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</header>
